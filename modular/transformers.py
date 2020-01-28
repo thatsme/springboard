@@ -45,7 +45,7 @@ class CategoriesExtractor(BaseEstimator, TransformerMixin):
 class TitleExtractor(BaseEstimator, TransformerMixin):
     """Extract Title from Name string."""
 
-    def __init__(self, use_all=False, newcolumn, column):
+    def __init__(self, newcolumn, column, use_all=False):
         self.use_all = use_all
         self.newcolumn = newcolumn
         self.column = columns
@@ -78,8 +78,8 @@ class TitleExtractor(BaseEstimator, TransformerMixin):
         #self.df_combined[newcolumn] = self.df_combined[newcolumn].map(self.Title_Dictionary)
  
         return pd.DataFrame({
-            newcolumn: name.apply(lambda x: re.search(' ([A-Z][a-z]+)\.', x).group(1),
-            newcolumn: name..map(self.Title_Dictionary)
+            newcolumn: name.apply(lambda x: re.search(' ([A-Z][a-z]+)\.', x).group(1)),
+            newcolumn: name.map(self.Title_Dictionary)
         })
 
 
