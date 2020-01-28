@@ -7,6 +7,7 @@ import inspect
 import importlib
 import os
 import pandas as pd
+from MlUtil import Mlutil
 
 if __name__ == "__main__":
     cmd_folder = os.path.realpath(os.path.abspath(os.path.split(inspect.getfile( inspect.currentframe() ))[0]))
@@ -19,3 +20,6 @@ if __name__ == "__main__":
 
     train_dataset = pd.read_csv('../data/titanic_train.csv')
     test_dataset = pd.read_csv('../data/titanic_test.csv')
+
+    m = MlUtil(train_dataset, test_dataset, vb=3)
+    print(m.__version__)

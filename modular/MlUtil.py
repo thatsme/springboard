@@ -154,8 +154,8 @@ class MlUtil:
     # function to get oven/odd/null from cabine
     def get_type_cabine(self, cabine):
         rt = {
-            "even" : 2
-            "odd" : 1
+            "even" : 2,
+            "odd" : 1,
             "none" : 0
         }
 
