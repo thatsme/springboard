@@ -4,16 +4,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import re
 
-from sklearn.model_selection import cross_val_score, KFold, StratifiedKFold, train_test_split, GridSearchCV, RandomizedSearchCV
+from sklearn.model_selection import cross_val_score, KFold, train_test_split, GridSearchCV
 from sklearn.feature_selection import SelectKBest, f_classif, RFE
 from sklearn.linear_model import LinearRegression, LassoCV, RidgeCV
 from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestClassifier, ExtraTreesRegressor, ExtraTreesClassifier, AdaBoostClassifier, GradientBoostingClassifier
 from sklearn.svm import SVC
 import xgboost as xgb
-from SklearnHelper import SklearnHelper
-import configparser
-from distutils.util import strtobool
 
 from transformers import (CategoriesExtractor, CountryTransformer, GoalAdjustor,
                           TimeTransformer)
@@ -26,20 +23,13 @@ def check_name(f):
         return f(*args)
     return wrapper
 
-
 class MlUtil:
 # class that implements titanic EDA and Model
 
     # constructor
     def __init__(self, train=None, test=None, vb=0, model=None):
         self.verbose = vb
-        self.__version__ = "1.3.06"
-        self.config = configparser.ConfigParser()
-        self.config.read('MlUtil.ini')
-        self.modelTestGridRun = 0
-        self.modelTestRandomRun = 0
-        self.features = None
-
+        self.__version__ = "1.2"
         if(train is not None and test is not None):    
             self.train_data = train
             self.test_data = test
@@ -58,6 +48,8 @@ class MlUtil:
             #self.kf = KFold(self.ntrain, n_folds= self.NFOLDS, random_state=self.SEED)
             # sklearn >= 0.20
             self.kf = KFold(n_splits=self.NFOLDS, random_state=self.SEED)
+            self.features = None
+
         self.Title_Dictionary = {
             "Capt" : "Officier",
             "Col" : "Officier", 
@@ -77,110 +69,25 @@ class MlUtil:
             "Master" : "Master",
             "Lady" : "Royalty"
         }
-
-    def getVar(self, v, typevar):
-        if 'None' in v: 
-            return None
-        else:
-            if(v.isdigit()  and 'int' in typevar):
-                return int(v)
-            elif(v.replace('.', '', 1).isdigit()  and 'float' in typevar):
-                return float(v)
-            elif(v.isalnum() and 'str' in typevar):
-                return v
-            elif(v.isalpha() and 'str' in typevar):
-                return v
-
-    def setVar(self, v):
-        if(type(v) is int):
-            return str(v)
-        elif(type(v) is float):
-            return str(v)
-        elif(type(v) is bool):
-            if(v): return 'True'
-            return 'False'
-        elif(type(v) is str):
-            return v
-           
-
         
-    def getList(self, v):
-        if(v[0] == "[" and v[len(v)-1] == "]"):
-            t = v.replace("[", "").replace("]", "").split(",")
-            p = []
-            for q in t:
-                if q == 'None':
-                    p.append(None)
-                elif(q.upper() == "TRUE"):
-                    p.append(True)
-                elif(q.upper() == "FALSE"):
-                    p.append(False)
-                else:
-                    try: 
-                        p.append(int(q))
-                    except:
-                        try: 
-                            p.append(float(q))
-                        except:
-                            try:
-                                p.append(q)
-                            except:
-                                pass
-
-            return p 
-        else:
-            if v == 'None':
-                return None
-            elif(v.upper() == "TRUE"):
-                return True
-            elif(v.upper() == "FALSE"):
-                return False
-            else:
-                try: 
-                    return int(v)
-                except:
-                    try: 
-                        return float(v)
-                    except:
-                        try:
-                            return v
-                        except:
-                            pass
-            return ''
-
-
-    def writeConfig(self):
-        with open('MlUtil.ini', 'w') as configfile:
-            self.config.write(configfile)
-
     def display_all(self, df):
         with pd.option_context("display.max_rows", 1000, "display.max_columns", 1000): 
             display(df)
             
-    def RFE(self, train, num_feat):
-        #y = train["Survived"]
-        #X = train.drop("Survived",1)  
-        X = self.train_data
-        y = self.target
+    def RFE(self, train, feat):
+        y = train["Survived"]
+        X = train.drop("Survived",1)  
         #X_train, y_train, X_test, y_test = train_test_split(train, y, test_size=0.2)
         
-        #model = LinearRegression()
+        model = LinearRegression()
         #Initializing RFE model
-        rfe = RFE(self.working_est.get(), num_feat)
+        rfe = RFE(model, feat)
         #Transforming data using RFE
         X_rfe = rfe.fit_transform(X, y)  
         #Fitting the data to model
-        #model.fit(X_rfe, y)
-        self.working_est.fit(X_rfe, y)
-
-        a = np.array(X.columns)
-        b = a[rfe.support_]
-        c = rfe.ranking_[rfe.support_]
-        #print(X.columns)
-        print(b)
-        print(c)
-        #print(rfe.support_)
-        #print(rfe.ranking_)
+        model.fit(X_rfe, y)
+        print(rfe.support_)
+        print(rfe.ranking_)
         
     def LASSO(self, train):
         y = train["Survived"]
@@ -280,10 +187,10 @@ class MlUtil:
         if cabine_search:
             num = cabine_search.group(0)
             if np.float64(num) % 2 == 0:
-                return rt["even"]
+                return tr.even
             else:
-                return rt["odd"]
-        return rt["none"]
+                return rt.odd
+        return rt.none
 
     def get_evenodd(self, value):
         # Use a regular expression to search for a number.
@@ -327,6 +234,7 @@ class MlUtil:
     ####
     #### Handling missing values ( implements value/median/mean/std/max/min)
     ####
+    
     def handling_missings(self, column, function, value=None):    
         if(function=="value"):
             self.df_combined[column] = self.df_combined[column].fillna(value)
@@ -351,19 +259,12 @@ class MlUtil:
     ####
     # Get the lenght of column and save it in a newcolumn
     @check_name
-    def transform_lenght_new(self,newcolumn, column):
+    def transform_lenght(self,newcolumn, column):
         for nc, c in zip(newcolumn, column):
             self.df_combined[nc] = self.df_combined[c].apply(lambda x: len(x))
         if(self.verbose>1):
-            print("Transformation done")
+            print("done")
     
-    @check_name
-    def transform_socialstatus(self, newcolumn, column):
-        for nc, c in zip(newcolumn, column):
-            self.df_combined[nc] = self.df_combined[c].map({1:'upper',2:'middle',3:'lower'})  
-        if(self.verbose>1):
-            print("Transformation done")
-
     # Transform the column in an integer
     @check_name
     def transform_int(self, column, function):
@@ -371,7 +272,7 @@ class MlUtil:
             if(function=="int"):
                 self.df_combined[c] = self.df_combined[c].astype(int)
         if(self.verbose>1):
-            print("Transformation done")
+            print("done")
 
     # Transform the column in an float
     @check_name
@@ -382,21 +283,20 @@ class MlUtil:
         if(self.verbose>1):
             print("Transformation done")
 
-    # Transform column in dummies        
+    # Transform column in dummies 
     @check_name
-    def transform_dummies(self, column, prefix, drop_first=False, axis=1):
+    def transform_dummies(self, column, prefix, axis=1):
         for c, p in zip(column,prefix):
-            self.df_combined = pd.concat([self.df_combined, pd.get_dummies(self.df_combined[c], drop_first=drop_first, prefix=p)], axis=axis)
+            self.df_combined = pd.concat([self.df_combined, pd.get_dummies(self.df_combined[c], prefix=p)], axis=axis)
         if(self.verbose>1):
-            print("Transformation done")
-    
+            print("done")
     @check_name
     def transform_drop(self, column, inplace=True):
         for c in column:
             self.df_combined.drop(c, axis=1, inplace=inplace)
 
         if(self.verbose>1):
-            print("Transformation done")
+            print("done")
             
     # Transform title ( Extract title from colum -> Name, and set newcolumn)
     @check_name
@@ -406,15 +306,46 @@ class MlUtil:
         self.df_combined[newcolumn] = self.df_combined[newcolumn].map(self.Title_Dictionary)
             
         if(self.verbose>1):
-            print("Transformation done")
-                        
+            print("done")
+            
+    # Create category for title column
+    @check_name
+    def transform_titlecat(self, newcolumn, column, mappings=None):
+        if(mappings is not None):
+            title_mapping = mappings
+        else:
+            title_mapping = {
+                "Mr": 1,
+                "Miss": 2,
+                "Mrs": 3,
+                "Master": 4,
+                "Dr": 5,
+                "Rev": 6,
+                "Major": 7,
+                "Col": 7,
+                "Mlle": 2,
+                "Mme": 3,
+                "Don": 9,
+                "Dona": 9,
+                "Lady": 10,
+                "Countess": 10,
+                "Jonkheer": 10,
+                "Sir": 9,
+                "Capt": 7,
+                "Ms": 2,
+            }
+        for datasets, names in zip(self.combine, self.wichname):
+            datasets[newcolumn] = datasets[column].map(title_mapping)
+        if(self.verbose>1):
+            print("done")
+            
     # Extract surname
     @check_name
     def transform_surname_new(self):
         self.df_combined["Surname"] = self.df_combined["Name"].apply(lambda x: x.split(",")[0].lower())
         if(self.verbose>1):
-            print("Transformation done")
-
+            print("done")
+    
     @check_name
     def transform_surname_members_new(self):
         table_ticket = pd.DataFrame(self.df_combined["Surname"].value_counts())
@@ -428,28 +359,28 @@ class MlUtil:
                 sort=False,
         )
         if(self.verbose>1):
-            print("Transformation done")
+            print("done")
 
     @check_name
     def transform_cabintype_new(self):
         self.df_combined["Cabin"] = self.df_combined["Cabin"].fillna(" ")
         self.df_combined["CabinType"] = self.df_combined["Cabin"].apply(self.get_type_cabine)
         if(self.verbose>1):
-            print("Transformation done")
+            print("done")
 
     @check_name
     def transform_cabincat(self):
         for datasets, names in zip(self.combine, self.wichname):
             datasets["CabinCat"] = pd.Categorical(datasets["Cabin"].fillna("0").apply(lambda x: x[0])).codes    
         if(self.verbose>1):
-            print("Transformation done")
-    
-    @check_name 
+            print("done")
+            
+    @check_name
     def transform_hascabin_new(self):
         # New Column Has_Cabin
         self.df_combined['Has_Cabin'] = ~self.df_combined.Cabin.isnull()
         if(self.verbose>1):
-            print("Transformation done")
+            print("done")
             
     @check_name
     def transform_splitcabin_new(self):
@@ -458,13 +389,13 @@ class MlUtil:
         self.df_combined['Cabin_Deck'] = self.df_combined['Cabin'].str.extract('([A-Z]+)')
         self.df_combined['Cabin_Deck'] = self.df_combined['Cabin_Deck'].fillna('Z')
         if(self.verbose>1):
-            print("Transformation done")
-                        
-    @check_name
+            print("done")
+
+    @check_name     
     def transform_cabindeck_new(self):
         self.df_combined["Cabin_Deck"] = pd.Categorical(self.df_combined["Cabin_Deck"]).codes
         if(self.verbose>1):
-            print("Transformation done")
+            print("done")
             
     @check_name
     def transform_removedeck(self, deck):
@@ -472,7 +403,7 @@ class MlUtil:
         self.test_data = self.test_data[self.test_data['Cabin_Deck'] != deck]
         self.combine = [self.train_data, self.test_data]
         if(self.verbose>1):
-            print("Transformation done")
+            print("done")
         
     @check_name
     def transform_famsize_new(self):
@@ -482,7 +413,7 @@ class MlUtil:
         self.df_combined['SmallFamily'] = self.df_combined['Fam_Size'].map(lambda s:1 if 2 <= s <= 4 else 0)
         self.df_combined['LargeFamily'] = self.df_combined['Fam_Size'].map(lambda s:1 if 5 <= s else 0)
         if(self.verbose>1):
-            print("Transformation done")
+            print("done")
 
     @check_name
     def transform_isalone_new(self):
@@ -491,7 +422,7 @@ class MlUtil:
         self.df_combined.loc[self.df_combined['Fam_Size'] == 1, 'IsAlone'] = 1
             
         if(self.verbose>1):
-            print("Transformation done")
+            print("done")
             
     @check_name
     def transform_farexperson_new(self):
@@ -499,31 +430,31 @@ class MlUtil:
         self.df_combined['Fare_Per_Person'] = self.df_combined['Fare']/(self.df_combined['Fam_Size']+1)
         self.df_combined['Fare_Per_Person'] = self.df_combined['Fare_Per_Person'].astype(int)
         if(self.verbose>1):
-            print("Transformation done")
+            print("done")
             
-                            
-    @check_name
+    @check_name         
     def transform_quant_age(self, n=4, dpl='raise'):
         # Quantization of Age for datasets in 8 segments (default = 4)
         for datasets, names in zip(self.combine, self.wichname):
             datasets['Age'] = datasets['Age'].astype(int)
             datasets['CatAge'] = pd.qcut(datasets["Age"], q=n, labels=False, duplicates=dpl )
         if(self.verbose>1):
-            print("Transformation done")
+            print("done")
             print (self.train_data[['CatAge', 'Survived']].groupby(['CatAge'], as_index=False).mean())
-                  
+    
     @check_name
-    def transform_age_group(self, newcolumn, column):
+    def transform_age(self, n=4):
         # Mapping Age
-        agesplit = [0,10,18,25,40,90]
-        agestatus = ['Adolescent','Teenager','Young Adult','Adult','Elder']
-
-        self.df_combined[newcolumn]=pd.cut(self.df_combined[column],agesplit,labels=agestatus)
-
+        for datasets, names in zip(self.combine, self.wichname):
+            datasets.loc[ datasets['Age'] <= 16, 'Age'] 					       = 0
+            datasets.loc[(datasets['Age'] > 16) & (datasets['Age'] <= 32), 'Age'] = 1
+            datasets.loc[(datasets['Age'] > 32) & (datasets['Age'] <= 48), 'Age'] = 2
+            datasets.loc[(datasets['Age'] > 48) & (datasets['Age'] <= 64), 'Age'] = 3
+            datasets.loc[ datasets['Age'] > 64, 'Age']                        
         if(self.verbose>1):
-                print("Transformation done")
-        
-    @check_name
+            print("done")
+
+    @check_name    
     def transform_fare(self, n=4):
         # Mapping Fare
         for datasets, names in zip(self.combine, self.wichname):
@@ -533,7 +464,7 @@ class MlUtil:
             datasets.loc[(datasets['Fare'] > 14.454) & (datasets['Fare'] <= 31), 'Fare']   = 2
             datasets.loc[ datasets['Fare'] > 31, 'Fare'] 							        = 3
         if(self.verbose>1):
-                print("Transformation done")
+            print("done")
                 
     @check_name
     def transform_quant_fare(self, n = 8, dpl = 'raise'):
@@ -542,22 +473,23 @@ class MlUtil:
             datasets['Fare'] = datasets['Fare'].astype(int)
             datasets['CatFare']= pd.qcut(datasets["Fare"], q=n, labels=False, duplicates=dpl)
         if(self.verbose>1):
-            print("Transformation done ")
+            print("done ")
             print (self.train_data[['CatFare', 'Survived']].groupby(['CatFare'], as_index=False).mean())
-        
+    
+    @check_name
     def transform_ageclass(self):
         for datasets, names in zip(self.combine, self.wichname):     
             datasets['Age_Class'] = datasets['Age']* datasets['Pclass']
             datasets['Age_Class'] = datasets['Age_Class'].astype(int)
         if(self.verbose>1):
-            print("Transformation done")
+            print("done")
     
     @check_name
     def transform_embarked(self):
         for datasets, names in zip(self.combine, self.wichname):     
             datasets["Embarked"] = pd.Categorical(datasets["Embarked"]).codes
         if(self.verbose>1):
-            print("Transformation done")
+            print("done")
         
     def get_person(self, passenger):
         child_age = 18
@@ -573,7 +505,7 @@ class MlUtil:
     def transform_person_new(self, getdummies=False):
         self.df_combined['Person'] = self.df_combined[["Age", "Sex"]].apply(self.get_person, axis=1)
         if(self.verbose>1):
-            print("Transformation done")
+            print("done")
 
         
     def transform_ticket_members(self):
@@ -623,7 +555,6 @@ class MlUtil:
             )
         return self.grouped_median_train[condition]['Age'].values[0]
     
-    @check_name
     def transform_age_new(self):
         self.df_combined['Age'] = self.df_combined.apply(lambda row: self.fill_age(row) if np.isnan(row['Age']) else row['Age'], axis=1)
         if(self.verbose>1):
@@ -914,19 +845,19 @@ class MlUtil:
     def set_models(self):
         # Create 5 objects that represent our 4 models
         self.rf = SklearnHelper(clf=RandomForestClassifier, seed=self.SEED, params=self.rf_params)
-        #self.et = SklearnHelper(clf=ExtraTreesClassifier, seed=self.SEED, params=self.et_params)
-        #self.ada = SklearnHelper(clf=AdaBoostClassifier, seed=self.SEED, params=self.ada_params)
-        #self.gb = SklearnHelper(clf=GradientBoostingClassifier, seed=self.SEED, params=self.gb_params)
-        #self.svc = SklearnHelper(clf=SVC, seed=self.SEED, params=self.svc_params)
+        self.et = SklearnHelper(clf=ExtraTreesClassifier, seed=self.SEED, params=self.et_params)
+        self.ada = SklearnHelper(clf=AdaBoostClassifier, seed=self.SEED, params=self.ada_params)
+        self.gb = SklearnHelper(clf=GradientBoostingClassifier, seed=self.SEED, params=self.gb_params)
+        self.svc = SklearnHelper(clf=SVC, seed=self.SEED, params=self.svc_params)
         
         
     def oof_traintest(self):
         # Create our OOF train and test predictions. These base results will be used as new features (self.et, x_train, y_train, x_test)
+        self.et_oof_train, self.et_oof_test = self.get_oof(self.et, self.X_train, self.y, self.X_test)         # Extra Trees
         self.rf_oof_train, self.rf_oof_test = self.get_oof(self.rf, self.X_train, self.y, self.X_test)         # Random Forest
-        #self.et_oof_train, self.et_oof_test = self.get_oof(self.et, self.X_train, self.y, self.X_test)         # Extra Trees
-        #self.ada_oof_train, self.ada_oof_test = self.get_oof(self.ada, self.X_train, self.y, self.X_test)      # AdaBoost 
-        #self.gb_oof_train, self.gb_oof_test = self.get_oof(self.gb, self.X_train, self.y, self.X_test)         # Gradient Boost
-        #self.svc_oof_train, self.svc_oof_test = self.get_oof(self.svc, self.X_train, self.y, self.X_test)      # Support Vector Classifier
+        self.ada_oof_train, self.ada_oof_test = self.get_oof(self.ada, self.X_train, self.y, self.X_test)      # AdaBoost 
+        self.gb_oof_train, self.gb_oof_test = self.get_oof(self.gb, self.X_train, self.y, self.X_test)         # Gradient Boost
+        self.svc_oof_train, self.svc_oof_test = self.get_oof(self.svc, self.X_train, self.y, self.X_test)      # Support Vector Classifier
         print("Training is complete")
         
     def set_features(self, myFeatures=None):
@@ -980,7 +911,7 @@ class MlUtil:
         self.feature_dataframe_mean.head(5)
         #print(self.feature_dataframe_mean)
         
-    def base_predictions_train(self, mask=None):
+    def base_predictions_train(self):
         self.base_predictions_train = pd.DataFrame( 
             {'RandomForest': self.rf_oof_train.ravel(),
              'ExtraTrees': self.et_oof_train.ravel(),
@@ -991,11 +922,11 @@ class MlUtil:
         
         self.base_predictions_train.head()    
     
-    def concatenate_base_predictions(self, mask=None):
-        #self.X_train = np.concatenate(( self.et_oof_train, self.rf_oof_train, self.ada_oof_train, self.gb_oof_train, self.svc_oof_train), axis=1)
-        #self.X_test = np.concatenate(( self.et_oof_test, self.rf_oof_test, self.ada_oof_test, self.gb_oof_test, self.svc_oof_test), axis=1)
-        self.X_train = self.rf_oof_train
-        self.x_test = self.rf_oof_test
+    def concatenate_base_predictions(self):
+        self.X_train = np.concatenate(( self.et_oof_train, self.rf_oof_train, self.ada_oof_train, self.gb_oof_train, self.svc_oof_train), axis=1)
+        self.X_test = np.concatenate(( self.et_oof_test, self.rf_oof_test, self.ada_oof_test, self.gb_oof_test, self.svc_oof_test), axis=1)
+        #self.X_train = np.concatenate(( self.et_oof_train, self.rf_oof_train, self.ada_oof_train, self.gb_oof_train), axis=1)
+        #self.x_test = np.concatenate(( self.et_oof_test, self.rf_oof_test, self.ada_oof_test, self.gb_oof_test), axis=1)
 
     def test_XGBoost(self, param_test=None):       
         gsearch1 = GridSearchCV(estimator = xgb.XGBClassifier( learning_rate =0.1, n_estimators=140, max_depth=5,
@@ -1024,11 +955,9 @@ class MlUtil:
                 scale_pos_weight : 1    
             }
             
-        gbm = xgb.XGBClassifier(**param_run).fit(self.X_train, self.y)
-        print(gbm.coef_)
-
-        #evals_result = gbm.evals_result()
-        #print(evals_result)
+        gbm = xgb.XGBClassifier(*+param_run).fit(self.X_train, self.y)
+        evals_result = gbm.evals_result()
+        print(evals_result)
         
         self.predictions = gbm.predict(self.X_test)
         
@@ -1036,7 +965,7 @@ class MlUtil:
         PassengerId = np.array(self.test_data["PassengerId"]).astype(int)
         my_prediction = pd.DataFrame(self.predictions, PassengerId, columns=["Survived"])
         from datetime import datetime
-        filename = "my_submission_"+str(datetime.now())[11:19].replace(":","_")+".csv"
+        filename = "my_submission"+str(datetime.now())[11:19].replace(":","_")+".csv"
         
         my_prediction.to_csv(filename, index_label=["PassengerId"])
         
@@ -1058,150 +987,17 @@ class MlUtil:
                 for f in range(len(scores)):
                     print("%0.2f %s" % (scores[indices[f]],self.features[indices[f]]))
          
-    ####################################################################################
-    ####################################################################################
-    ####################################################################################
-    ####################################################################################
-    ####################################################################################
-
-    def inject_estimator(self, estimator):
-        self.working_est = estimator
-
-    def modelRandomTest(self):
-        self.config.read('MlUtil.ini')
-        # RS mean Random Search
-        label_suffix = "RS_"
-
-        self.modelTestRandomRun += 1
-        print("run numero ", self.modelTestRandomRun)
-        section_grid = self.working_est.section_name+label_suffix+str(self.modelTestRandomRun)
-        RFCPR = self.config[section_grid]
-        if(self.verbose>2):
-            for key in RFCPR: 
-                print(key, " : ", RFCPR[key])
-
-        print("===================\n")
-        random_grid = { }
-        #splitat = 7
-        for key in RFCPR: 
-            #mask, k = key[:splitat], key[splitat:]
-            random_grid[key] = self.getList(RFCPR[key])
-
-        print(random_grid)
-        print(self.features)
-        
-        rf_random = RandomizedSearchCV(estimator = self.working_est.get(), param_distributions = random_grid, n_iter = 100, cv = 5, verbose=2, random_state=42, n_jobs = -1)
-        rf_random.fit(self.train_data[self.features], self.target)
-
-        print('\n',rf_random.best_estimator_)
-        
-        ## Write in iteration section 
-        section_name = self.working_est.section_name+"IT"+label_suffix+str(self.modelTestRandomRun)
-        self.config[section_name] = {}
-        for key, value in rf_random.best_params_.items():
-            self.config[section_name][key] = self.setVar(value)
-
-        ## Write in estimator section the best parameters get by Random Search function
-        section_name = self.working_est.section_name
-        for key, value in rf_random.best_params_.items():
-            self.config[section_name][key] = self.setVar(value)
-
-        self.writeConfig()
-
-        self.displayGS(rf_random)
-
-    def modelGridTest(self, estimator):
-        self.config.read('MlUtil.ini')
-        # GS mean Grid Search
-        label_suffix = "GS_"
-
-        self.modelTestGridRun += 1
-        print("run numero ", self.modelTestGridRun)
-        section_grid = self.working_est.section_name+label_suffix+str(self.modelTestGridRun)
-        RFCPG = self.config[section_grid]
-        if(self.verbose>2):
-            for key in RFCPG: 
-                print(key, " : ", RFCPG[key])
-
-        print("===================\n")
-        #self.rfc_test = RandomForestClassifier()
-        param_grid = { }
-        for key in RFCPG: 
-            param_grid[key] = self.getList(RFCPG[key])
-                
-
-        CV_rfc = GridSearchCV(estimator=self.working_est.get(), param_grid=param_grid, verbose = 1, cv= 5)
-        CV_rfc.fit(self.train_data[self.features], self.target)
-
-        print('\n',CV_rfc.best_estimator_)
-        
-        ## Write in iteration section 
-        section_name = self.working_est.section_name+"IT"+label_suffix+str(self.modelTestGridRun)
-        self.config[section_name] = {}
-        for key, value in CV_rfc.best_params_.items():
-            self.config[section_name][key] = self.setVar(value)
-
-        ## Write in estimator section 
-        section_name = self.working_est.section_name
-        for key, value in CV_rfc.best_params_.items():
-            self.config[section_name][key] = self.setVar(value)
-
-        self.writeConfig()
-
-        self.displayGS(CV_rfc)
-
     def setModel(self):
-        self.config.read('MlUtil.ini')
-        section = self.working_est.section_name
-        RFC = self.config[section]
-        if(self.verbose>2):
-            for key in RFC: 
-                print(key," : ", RFC[key])
-
-        param_dictionary = {}
-        for key in RFC: 
-            param_dictionary[key] = self.getList(RFC[key])
-
-        return self.working_est.fit(self.train_data[self.features], self.target)
-
-        #self.rfc = RandomForestClassifier(
-        #                bootstrap = RFC.getboolean('bootstrap'), 
-        #                ccp_alpha = RFC.getfloat('ccp_alpha'), 
-        #                class_weight = self.getVar(RFC.get('class_weight'),['list', 'dict', 'str']),
-        #                criterion = RFC.get('criterion'), 
-        #                max_depth = self.getVar(RFC.get('max_depth'),['int']), 
-        #                max_features = self.getVar(RFC.get('max_features'),['int', 'float', 'str']),
-        #                max_leaf_nodes = self.getVar(RFC.get('max_leaf_nodes'),['int']), 
-        #                max_samples = self.getVar(RFC.get('max_samples'),['int', 'float']),
-        #                min_impurity_decrease = RFC.getfloat('min_impurity_decrease'), 
-        #                min_samples_leaf = self.getVar(RFC.get('min_samples_leaf'),['int', 'float']), 
-        #                min_samples_split = self.getVar(RFC.get('min_samples_split'),['int', 'float']),
-        #                min_weight_fraction_leaf = RFC.getfloat('min_weight_fraction_leaf'), 
-        #                n_estimators = RFC.getint('n_estimators'),
-        #                n_jobs = self.getVar(RFC.get('n_jobs'),['int']), 
-        #                oob_score = RFC.getboolean('oob_score'), 
-        #                random_state = self.getVar(RFC.get('random_state'),['int']),
-        #                verbose = RFC.getboolean('verbose'), 
-        #                warm_start = RFC.getboolean('warm_start'))
-
-        #print(self.rfc)
-
-    def displayGS(self, results):
-        print(f'Best parameters are: {results.best_params_}')
-        print("\n")
-        mean_score = results.cv_results_['mean_test_score']
-        std_score = results.cv_results_['std_test_score']
-        params = results.cv_results_['params']
-        for mean,std,params in zip(mean_score,std_score,params):
-            print(f'{round(mean,3)} + or -{round(std,3)} for the {params}')
-
-    def cross_val_score(self, myFeatures=None ):
+        self.rfc = RandomForestClassifier(
+            n_estimators=3000, min_samples_split=4, class_weight={0: 0.745, 1: 0.255}
+        )
+        
+    def cross_val_score(self, myFeatures=None):
         if(myFeatures != None):
             self.features = myFeatures
             
-        #kf = KFold(n_splits=5, shuffle=True, random_state=1)
-        kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=1)
-        scores = cross_val_score(self.working_est.get(), self.train_data[self.features], self.target, cv=kf)
+        kf = KFold(n_splits=3, random_state=1)
+        scores = cross_val_score(self.rfc, self.train_data[self.features], self.target, cv=kf)
         print(
             "Accuracy: %0.3f (+/- %0.2f) [%s]"
             % (scores.mean() * 100, scores.std() * 100, "RFC Cross Validation")
@@ -1211,12 +1007,11 @@ class MlUtil:
         if(myFeatures != None):
             self.features = myFeatures
         
-        #self.rfc.fit(self.train_data[self.features], self.target)
-        self.working_est.score(self.train_data[self.features], self.target)
-        score = self.working_est.vscore
+        self.rfc.fit(self.train_data[self.features], self.target)
+        score = self.rfc.score(self.train_data[self.features], self.target)
         print("Accuracy: %0.3f            [%s]" % (score * 100, "RFC full test"))
         
-        importances = self.working_est.getfi()
+        importances = self.rfc.feature_importances_
         indices = np.argsort(importances)[::-1]
         for f in range(len(self.features)):
             print(
@@ -1235,19 +1030,16 @@ class MlUtil:
          
         # Moved to a metodh set_xtraintest()
         #X_train = self.train_data[self.features]
-        X_test = self.test_data[self.features]
+        #X_test = self.test_data[self.features]
         
-        #print(X_test.head())
-        self.predictions = self.working_est.predict(X_test)
-        #print(self.predictions)
+        
+        predictions = self.rfc.predict(self.X_test)
         #predictions
         PassengerId = np.array(self.test_data["PassengerId"]).astype(int)
-        my_prediction = pd.DataFrame(self.predictions, PassengerId, columns=["Survived"])
-        my_prediction["Survived"]  =  my_prediction["Survived"].astype(int)
-        from datetime import datetime
-        filename = "my_submission_"+str(datetime.now())[11:19].replace(":","_")+".csv"
+        my_prediction = pd.DataFrame(predictions, PassengerId, columns=["Survived"])
+
+        my_prediction.to_csv("my_submission.csv", index_label=["PassengerId"])
         
-        my_prediction.to_csv(filename, index_label=["PassengerId"])
-
-
+        #output = pd.DataFrame({'PassengerId': test_data.PassengerId, 'Survived': predictions})
+        #output.to_csv('my_submission.csv', index=False)
         print("Your submission was successfully saved!")

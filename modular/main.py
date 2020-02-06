@@ -30,5 +30,41 @@ if __name__ == "__main__":
 
     print(train_dataset.head())
 
-    #m.transform_title_new("Title", "Name")
-    #m.transform_dummies(["Title"], ["Title"], True)
+    m.transform_title_new("Title", "Name")
+    m.transform_dummies(["Title"], ["Title"], True)
+
+    #p = m.getCombined()
+    #print(p.Title.head())
+
+    m.process_age()
+    m.transform_age_new()
+
+    m.transform_age_group("AgeGroup", "Age")
+    m.transform_dummies(["AgeGroup"], ["AG"], True)
+
+    m.transform_surname_new()
+
+    m.transform_lenght_new(["NameLength"], ["Name"])
+
+    m.transform_surname_members_new()
+
+    m.transform_cabintype_new()
+
+    m.transform_hascabin_new()
+
+    m.transform_splitcabin_new()
+
+    m.transform_famsize_new()
+
+    m.transform_isalone_new()
+
+    m.transform_person_new()
+
+    m.transform_socialstatus(["Social"], ["Pclass"])
+
+    m.transform_dummies(["Social"], ["SC"], 1)
+
+    m.handling_missings("Embarked", "value", "S")
+
+    m.handling_missings("Fare", "median")
+
