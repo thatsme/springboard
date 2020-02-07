@@ -9,7 +9,11 @@ import inspect
 import importlib
 import os
 import pandas as pd
+import sklearn as sk
 print("Pandas => ", pd.__version__)
+from sklearn.ensemble import RandomForestClassifier, ExtraTreesRegressor, ExtraTreesClassifier, AdaBoostClassifier, GradientBoostingClassifier
+print("Sklearn => ", sk.__version__)
+
 from MlUtil import MlUtil
 from Estimator import Estimator
 
@@ -83,7 +87,10 @@ if __name__ == "__main__":
 
     m.df_combined.head()
 
-
+    # Resplit the combined dataset in train and test & 
+    # Set target variable in this case Survived variable
+    # 
+    m.setTarget("Survived")
 
     ## Define my feature list 
     ##
@@ -101,7 +108,11 @@ if __name__ == "__main__":
 
     #myTitan.set_features(myListClean)
 
-    erf = Estimator(RandomForestClassifier(),"RandomForestClassifier")
+    #erf = Estimator(RandomForestClassifier(),"RandomForestClassifier")
+    #erf = Estimator(ExtraTreesRegressor(),"ExtraTreesRegressor")
+    erf = Estimator(ExtraTreesClassifier(),"ExtraTreesClassifier")
+    #erf = Estimator(AdaBoostClassifier(),"AdaBoostClassifier")
+    #erf = Estimator(GradientBoostingClassifier(),"GradientBoostingClassifier")
 
     m.inject_estimator(erf)
 
@@ -151,8 +162,15 @@ if __name__ == "__main__":
 
     m.features
 
-    m.config.read('..\\data\\MlUtil.ini')
+    m.config.read('..\\input\\MlUtil.ini')
     m.modelTestRandomRun = 0
 
     # Start model testing
     m.modelRandomTest()
+
+    m.setModel()
+
+    m.cross_val_score()
+
+    m.full_score()
+
