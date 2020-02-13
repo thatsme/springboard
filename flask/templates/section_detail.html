@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+ 
+{% block container %}
+    <div class="top-pad">
+        {% for your_list_element in your_list %}
+        <div class="well">
+            <h2>
+              <a href="{{ url_for('detailmethod', key=your_list_element) }}">{{ your_list_element }}</a>
+            </h2>
+          </div>
+        {% endfor %}
+    </div>
+{% endblock %}
