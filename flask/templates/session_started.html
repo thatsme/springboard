@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+ 
+{% block container %}
+
+    <p>Session Status values :         
+    <table>
+        <tr color="grey">
+            <th>Key</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td colspan="2"><hr style="height:3px;background-color:chocolate;border:none;"></td>
+        </tr>
+        <tr>
+            <td>Last session generated</td>
+            <td>{{ version["generatedsession"] }}</td>
+        </tr>
+        <tr>
+            <td>Active session</td>
+            <td>{{ version["activesession"] }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><hr style="height:6px;background-color:black;border:none;"></td>
+        </tr>
+        <tr>
+            <td>Test data file</td>
+            <td>{{ version["test"] }}</td>
+        </tr>
+        <tr>
+            <td>Test data file loaded in session</td>
+            <td>{{ version["test_loaded"] }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><hr style="height:6px;background-color:black;border:none;"></td>
+        </tr>
+        <tr>
+            <td>Train data file</td>
+            <td>{{ version["train"] }}</td>
+        </tr>
+        <tr>
+            <td>Train data file loaded in session</td>
+            <td>{{ version["train_loaded"] }}</td>
+        </tr>
+        <tr>
+            <td colspan="2"><hr style="height:6px;background-color:black;border:none;"></td>
+        </tr>
+        <tr>
+            <td>Full data file</td>
+            <td>{{ version["full"] }}</td>
+        </tr>
+        <tr>
+            <td>Full data file loaded in session</td>
+            <td>{{ version["full_loaded"] }}</td>
+        </tr>
+
+    </table>
+    </p>
+
+{% endblock %}

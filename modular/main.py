@@ -106,20 +106,21 @@ if __name__ == "__main__":
 
     myListPlusSurvived = ["Survived", "female","male","male_adult","female_adult","child","TitleCat","Pclass","NameLength","Fare","Embarked", "Cabin_Deck"]
 
-    #myTitan.set_features(myListClean)
+    #m.set_features(myListClean)
 
     #erf = Estimator(RandomForestClassifier(),"RandomForestClassifier")
     #erf = Estimator(ExtraTreesRegressor(),"ExtraTreesRegressor")
-    erf = Estimator(ExtraTreesClassifier(),"ExtraTreesClassifier")
+    #erf = Estimator(ExtraTreesClassifier(),"ExtraTreesClassifier")
     #erf = Estimator(AdaBoostClassifier(),"AdaBoostClassifier")
-    #erf = Estimator(GradientBoostingClassifier(),"GradientBoostingClassifier")
+    erf = Estimator(GradientBoostingClassifier(),"GradientBoostingClassifier")
+    #erf = Estimator(SVC(),"SVC")
 
     m.inject_estimator(erf)
 
-    #tr = myTitan.train_data[myTitan.features]
+    #tr = m.train_data[m.features]
     tr = m.train_data
-    #myTitan.display_all(tr)
-    #ts = myTitan.test_data[myTitan.features]
+    #m.display_all(tr)
+    #ts = m.test_data[m.features]
     m.RFE(tr, 13)
 
     m.LASSO(tr)
@@ -156,18 +157,19 @@ if __name__ == "__main__":
     #ccl.remove("Deck_G")
     #ccl.remove("Singleton")
 
-    bha = ['Fare','Title_Mr', 'NameLength', 'Surname_Members','CabinType', 'Fam_Size', 'Deck_Z', 'P_female_adult', 'P_male_adult', 'S_male','Fare_Per_Person']
+    definitiveFeatureList = ['Fare','Title_Mr', 'NameLength', 'Surname_Members','CabinType', 'Fam_Size', 'Deck_Z', 'P_female_adult', 'P_male_adult', 'S_male','Fare_Per_Person']
 
-    m.set_features(bha)
+    m.set_features(definitiveFeatureList)
 
     m.features
 
     m.config.read('..\\input\\MlUtil.ini')
     m.modelTestRandomRun = 0
 
-    # Start model testing
+    # Start model testing with Random SearchCV
     m.modelRandomTest()
 
+    # Going evaluate accuracy with best model
     m.setModel()
 
     m.cross_val_score()

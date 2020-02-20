@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+ 
+{% block container %}
+      <table border = 1>
+        <tr color="grey">
+            <th>Key</th>
+            <th>Value</th>
+        </tr>
+        <form action = "http://localhost:5000/generalconfig" method = "POST">
+         {% for key, value in data.items() %}
+            <tr>
+               <th> {{ key }} </th>
+               <td><input type="input" name={{ key }} value={{ value }}></input> </td>
+            </tr>
+         {% endfor %}
+         <tr><td colspan="4"><input type="submit" value="Change General Config"></td></tr>
+         </form>
+     </table>
+{% endblock %}

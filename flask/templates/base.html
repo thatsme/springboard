@@ -24,31 +24,65 @@
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Config <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href={{ url_for('start_session', key='full') }}>Start new Session</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href={{ url_for('session_status', key='full') }}>Session Status</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#">{{ mysession[-1] }}</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href={{ url_for('general_config', key='full') }}>General Config</a></li>
+              </ul>
+            </li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Load Data <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href={{ url_for('upload_form', key='full') }}>Full Data</a></li>
-                <li><a href={{ url_for('upload_form', key='train') }}>Train Data</a></li>
-                <li><a href={{ url_for('upload_form', key='test') }}>Test Data</a></li>
+                <li><a href={{ url_for('upload_form', key='full') }}>Upload File</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href={{ url_for('list_input', key='test') }}>List uploaded</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('test_pandas', key='test') }}>Head Train Data</a></li>
-                <li><a href="#">Head Test Data</a></li>
+                <li><a href={{ url_for('show_dataframe', type='train', where='head',num= 5) }}>Head Train Data</a></li>
+                <li><a href={{ url_for('show_dataframe', type='test', where='head',num= 5) }}>Head Test Data</a></li>
                 <li role="separator" class="divider"></li>
+                <li><a href={{ url_for('show_dataframe', type='train', where='tail',num= 5) }}>Tail Train Data</a></li>
+                <li><a href={{ url_for('show_dataframe', type='test', where='tail',num= 5) }}>Tail Test Data</a></li>
                 <li><a href="#">One more separated link</a></li>
               </ul>
             </li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Feature Engineering <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href={{ url_for('list_input', key='test') }}>Column List</a></li>
+                <li><a href={{ url_for('show_text', key='info', type='train') }}>Info on Train dataframe</a></li>
+                <li><a href={{ url_for('show_text', key='dtypes', type='train') }}>Shape on Train dataframe</a></li>
+                <li><a href={{ url_for('show_describe', key='describe', type='train') }}>Describe on Train dataframe</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('list_input', key='test') }}>List uploaded</a></li>
+                <li><a href={{ url_for('show_text', key='info', type='test') }}>Info on Test dataframe</a></li>
+                <li><a href={{ url_for('show_text', key='dtypes', type='test') }}>Shape on Test dataframe</a></li>
+                <li><a href={{ url_for('show_describe', key='describe', type='test') }}>Describe on Test dataframe</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href="#">Head Train Data</a></li>
-                <li><a href="#">Head Test Data</a></li>
+                <li><a href={{ url_for('column_list', type='full') }}>Column List [FULL]</a></li>
+                <li><a href={{ url_for('column_list', type='train') }}>Column List [TRAIN]</a></li>
+                <li><a href={{ url_for('column_list', type='test') }}>Column List [TEST]</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#">One more separated link</a></li>
+              </ul>
+            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">File Output <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href={{ url_for('list_output', jolly='all') }}>All Files by Session</a></li>
+                <li><a href={{ url_for('list_output', jolly='general_config') }}>General Config by Session</a></li>
+                <li><a href={{ url_for('list_output', jolly='plot') }}>Plots by Session</a></li>
+                <li><a href={{ url_for('list_output', jolly='info') }}>Dataframe Info by Session</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href={{ url_for('list_output', jolly='tbd') }}>TBD</a></li>
+                <li><a href={{ url_for('list_output', jolly='tbd') }}>TBD</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href={{ url_for('list_output', jolly='tbd') }}>TBD</a></li>
+                <li><a href={{ url_for('list_output', jolly='tbd') }}>TBD</a></li>
+                <li><a href={{ url_for('list_output', jolly='tbd') }}>TBD</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="#">One more separated link</a></li>
               </ul>
@@ -71,19 +105,25 @@
             </li>
 
           </ul>
-          <form class="navbar-form navbar-left">
+
+          <form class="navbar-form navbar-left" action = "http://localhost:5000/setsession" method = "POST">
             <div class="form-group">
-              <input type="text" class="form-control" placeholder="Search">
-            </div>
-            <button type="submit" class="btn btn-default">Submit</button>
+            <select name="activesession" width="300px">
+              {% for your_session in listsession %}
+                <option value={{ your_session }} SELECTED>{{ your_session }}</option>
+              {% endfor %}
+            </select>
+          </div>
+            <button type="submit" class="btn btn-default">Activate</button>
           </form>
           <ul class="nav navbar-nav navbar-right">
-            <li><a href="#">Link</a></li>
+            <li class="active"><a href="#">Link <span class="sr-only">(current)</span></a></li>
+            <li><a href={{ url_for('show_log', key='show_log') }}>Show Log</a></li>
             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Help <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href="#">Action</a></li>
-                <li><a href="#">Another action</a></li>
+                <li><a href="#">Loading Files</a></li>
+                <li><a href="#">Managing Sessions</a></li>
                 <li><a href="#">Something else here</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="#">Separated link</a></li>

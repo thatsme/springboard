@@ -7,26 +7,24 @@
             <tr>
               <th>###</th>
               <th>File Name</th>
-              <th>Columns</th>
-              <th>Load Type</th>
+              <th>Action Type</th>
             </tr>
             <form action = "http://localhost:5000/loaddata" method = "POST">
             {% for your_list_element in your_list %}
               <tr>
                 <td><input type="checkbox" name="fileselect" value={{ your_list_element }}></input><br></td>
-                <td><a href="{{ url_for('test_pandas', key=your_list_element) }}">{{ your_list_element }}</a></td>
-                <td><a href="{{ url_for('list_columns', key=your_list_element) }}">Show</a></td>
+                <td><a href="{{ url_for('show_text', key=your_list_element, type='key') }}">{{ your_list_element }}</a></td>
                 <td>
                   <select name="{{ your_list_element }}" width="300px">
-                    <option value="train" SELECTED>Select type</option>
-                      <option value="train">Train data</option>
-                      <option value="test">Test data</option>
-                      <option value="full">Full data</option>
+                    <option value="train" SELECTED>Select action</option>
+                      <option value="train">Action 1</option>
+                      <option value="test">Action 2</option>
+                      <option value="full">Action 2</option>
                   </select>
                 </td>
               </tr>
             {% endfor %}
-            <tr><td colspan="4"><input type="submit" value="Select File Data & Type"></td></tr>
+            <tr><td colspan="4"><input type="submit" value="Go for Action"></td></tr>
             </form>
             </table>
           </div>
