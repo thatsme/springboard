@@ -87,6 +87,16 @@ def Filter(mstring, msubstr, flag):
     else:
         return [str for str in mstring if any(sub in str for sub in msubstr)]
 
+def ResetDatapack():
+        ## Reset previouse values
+        datapack["test"] = ""
+        datapack["train"] = ""
+        datapack["full"] = ""
+        datapack["test_loaded"] = False
+        datapack["train_loaded"] = False
+        datapack["full_loaded"] = False
+        datapack["column_list"] = []
+
 class ReusableForm(Form):
     username = TextField('Name:', validators=[validators.required()])
     email = StringField('Email Address', [validators.Length(min=6, max=35)])
@@ -147,73 +157,116 @@ def setsession():
             mactive.append(result.get('activesession'))
             datapack["activesession"] = mactive[-1]
             m.setsession(datapack["activesession"])
-
+            
+        # If selection in datapack contain both train and test loaded files
+        # run the ML util and load files
         if("train" in datapack and "test" in datapack):
             if(m.loadSplittedData(UPLOAD_FOLDER+datapack["train"], UPLOAD_FOLDER+datapack["test"])):
                 datapack["train_loaded"] = True
                 datapack["test_loaded"] = True
 
+                # Copy back the dataframe and generate some statistics 
                 df_train = m.getTrain()
                 df_test = m.getTest()
 
-                ## Get info data on train
+                ## Get info data on train and copy on session prefixed text file  
                 buffer = io.StringIO()
                 df_train.info(buf=buffer)
                 s = buffer.getvalue()
-                with open(OUTPUT_FOLDER+datapack["activesession"]+"_df_traininfo.txt", "w", encoding="utf-8") as f:  
-                    f.write(s)
 
-                # Get info data on test
+                try:                
+                    with open(OUTPUT_FOLDER+datapack["activesession"]+"_df_traininfo.txt", "w", encoding="utf-8") as f:  
+                        f.write(s)
+                except:
+                    logger.debug("File write exception", exc_info=True)
+                    return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
+
+                # Get info data on test and copy on session prefixed text file 
                 buffer = io.StringIO()
                 df_test.info(buf=buffer)
                 s = buffer.getvalue()
-                with open(OUTPUT_FOLDER+datapack["activesession"]+"_df_testinfo.txt", "w", encoding="utf-8") as f:  
-                    f.write(s)
+                try:
+                    with open(OUTPUT_FOLDER+datapack["activesession"]+"_df_testinfo.txt", "w", encoding="utf-8") as f:  
+                        f.write(s)
+                except:
+                    logger.debug("File write exception", exc_info=True)
+                    return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
 
-                # Get dtypes data on train
+                # Get dtypes data on train and copy on session prefixed text file
                 buffer = io.StringIO()
                 df_train.dtypes.to_string(buf=buffer)
                 s = buffer.getvalue()
-                with open(OUTPUT_FOLDER+datapack["activesession"]+"_df_traindtypes.txt", "w", encoding="utf-8") as f:  
-                    f.write(s)
+                try:
+                    with open(OUTPUT_FOLDER+datapack["activesession"]+"_df_traindtypes.txt", "w", encoding="utf-8") as f:  
+                        f.write(s)
+                except:
+                    logger.debug("File write exception", exc_info=True)
+                    return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
 
-                # Get dtypes data on test
+                # Get dtypes data on test and copy on session prefixed text file
                 buffer = io.StringIO()
                 df_test.dtypes.to_string(buf=buffer)
                 s = buffer.getvalue()
-                with open(OUTPUT_FOLDER+datapack["activesession"]+"_df_testdtypes.txt", "w", encoding="utf-8") as f:  
-                    f.write(s)
-
-
-
+                try:                
+                    with open(OUTPUT_FOLDER+datapack["activesession"]+"_df_testdtypes.txt", "w", encoding="utf-8") as f:  
+                        f.write(s)
+                except:
+                    logger.debug("File write exception", exc_info=True)
+                    return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
+                    
+        # If selection in datapack contain single full file ( pre splitting ) 
+        # run the ML util and load the file
         elif("full" in datapack):        
             if(m.loadSingleData(UPLOAD_FOLDER+datapack["full"])):
+
                 datapack["full_loaded"] = True
+                
+                # Copy back the dataframe and generate some statistics 
                 df = m.getCombined()
+                
+                ## Get info data on full and copy on session prefixed text file  
                 buffer = io.StringIO()
                 df.info(buf=buffer)
                 s = buffer.getvalue()
-                with open(OUTPUT_FOLDER+datapack["activesession"]+"df_fullinfo.txt", "w", encoding="utf-8") as f:  
-                    f.write(s)
+                try:
+                    with open(OUTPUT_FOLDER+datapack["activesession"]+"df_fullinfo.txt", "w", encoding="utf-8") as f:  
+                        f.write(s)
+                except:
+                    logger.debug("File write exception", exc_info=True)
+                    return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
+                    
+                # Get dtypes data on full and copy on session prefixed text file
+                buffer = io.StringIO()
+                df.dtypes.to_string(buf=buffer)
+                s = buffer.getvalue()
+                try:
+                    with open(OUTPUT_FOLDER+datapack["activesession"]+"_df_fulldtypes.txt", "w", encoding="utf-8") as f:  
+                        f.write(s)
+                except:
+                    logger.debug("File write exception", exc_info=True)
+                    return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
 
         else:
             logger.error("Error, u have to select at list test/train csv or full single csv file")
             return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)       
+    else:
+        logger.debug("Illegal Method")
+        return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
 
-    #return(str(mactive))
     return render_template('session_started.html', version=datapack)
-    #return render_template("result.html",result = result)
-
+ 
 @app.route('/showdescribe/<key>,<type>')
 def show_describe(key, type):
+    '''
+    Fixing DataFrame.describe visualization for dataframe to list 
+    plus index column as standard column
+    '''
     df = m.getDescribe(type)
     df.round(3)
     cnames = df.columns.values.tolist()
     cnames.insert(0, "value")
     logger.info(df.info)
     dvalues = df.values.tolist()
-    #d = np.around(dvalues, 3)
-    #dval = d.tolist()
     ivalues = df.index.values.tolist()
     final = []
     for c in dvalues:
@@ -227,7 +280,6 @@ def show_describe(key, type):
             ivalues.pop(0)
             break
 
-
     rdata = list(final)
 
     return render_template("show_describe.html", column_names=cnames, link_column="Index", row_data=rdata, zip=zip)
@@ -235,6 +287,9 @@ def show_describe(key, type):
 
 @app.route('/showlog/<key>')
 def show_log(key):
+    '''
+    Show log file
+    '''
     file = LOG_FOLDER+"log.txt"
 
     try:
@@ -271,32 +326,34 @@ def show_text(key, type):
         return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
 
     return(render_template('show_text.html', content=content))
-
-@app.route('/upload')
-def upload_form():
-	return render_template('upload.html')
-
-
-@app.route('/upload', methods=['POST'])
+    
+@app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
-	if request.method == 'POST':
+    if(request.method == 'POST'):
         # check if the post request has the file part
-		if 'file' not in request.files:
-			flash('No file part')
-			return redirect(request.url)
-		file = request.files['file']
-		if file.filename == '':
-			flash('No file selected for uploading')
-			return redirect(request.url)
-		if file and allowed_file(file.filename):
-			filename = secure_filename(file.filename)
-			file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-			flash('File successfully uploaded')
-			return redirect('/')
-		else:
-			flash('Allowed file types are csv')
-			return redirect(request.url)
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        if file.filename == '':
+            flash('No file selected for uploading')
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            flash('File successfully uploaded')
+            return redirect('/upload')
+        else:
+            flash('Allowed file types are csv')
+            return redirect(request.url)
 
+    elif(request.method == 'GET'):
+        return render_template('upload.html')
+    
+    else:
+        logger.debug("Illegal Method")
+        return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
+      
 @app.route('/listinput')
 def list_input():
     path = os.getcwd()+"/static/input"
@@ -371,17 +428,14 @@ def general_config():
             general = gc[section_grid]
             return render_template('general_config.html', data=general)
         
-@app.route('/loaddata',methods = ['POST', 'GET'])
+        else:
+            logger.debug("Illegal Method")
+            return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
+        
+@app.route('/loaddata',methods = ['POST'])
 def laoddata():
     if request.method == 'POST':
-        ## Reset previouse values
-        datapack["test"] = ""
-        datapack["train"] = ""
-        datapack["full"] = ""
-        datapack["test_loaded"] = False
-        datapack["train_loaded"] = False
-        datapack["full_loaded"] = False
-
+        ResetDatapack()
         result = request.form
         temp = []
         for r in result.getlist('fileselect'):
@@ -393,6 +447,9 @@ def laoddata():
 
         return redirect("/startsession")
         #return render_template("result.html",result = result)
+    else:
+        logger.debug("Illegal Method")
+        return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
 
 @app.route('/detail/<key>')
 def detailmethod(key):
@@ -485,14 +542,19 @@ def template():
 @app.route('/ensamble', methods=['GET', 'POST'])
 def ensamble():
     form = ReusableForm(request.form)
-    if request.method == 'POST' and form.validate():
+    if(request.method == 'POST' and form.validate()):
         flash('Thanks for registering')
-        #return redirect(url_for('ensamble'))
+    elif(request.method == 'GET'):
+        pass
+    else:
+        logger.debug("Illegal Method")
+        return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
+
     return render_template('ensamble.html', form=form)
 
 @app.route('/about-us/')
 def about():
-    return render_template('home.html')
+    return render_template('about_us.html')
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0')
