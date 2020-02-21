@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+ 
+{% block container %}
+  <table class="table table-dark">
+      <thead class="thead-dark">
+      <tr>
+          <th scope="col">Column</th>
+          <th scope="col">Type</th>
+          <th scope="col">Prefix</th>
+          <th scope="col">New Name</th>
+          <th scope="col">Action</th>
+      </tr>
+      </thead>
+      <form action = "http://localhost:5000/featureseng" method = "POST">
+        <tr>
+        <td colspan="3">Subsetname : <input type="text" name="subset_name">&nbsp;Drop first : <input type="checkbox" name="dropfirst_name"></td>
+        </tr>
+        <tr>
+        <td colspan="3">Regular expression : <input type="text" name="re_name" size="30"></td>
+        </tr>
+        <tr>
+        <td colspan="3"><input type="submit" value="Take Action"></td>
+        </tr>
+        {% for column, type in columns %}
+        <tr>
+        <td><a href="{{ url_for('detailmethod', key=your_list_element) }}">{{ column }}</a></td>
+        <td>{{ type }}</td>
+        <td><input type="text" name="{{ column }}_prefix" size="5"></td>
+        <td><input type="text" name="{{ column }}_new" size="10"></td>
+        <td>
+          <select name="{{ column }}_select" width="300px">
+          <option value="" SELECTED>Select action</option>
+          <option value="subset">Create subset</option>
+          <option value="drop">Drop column</option>
+          <option value="toint">Convert to int</option>
+          <option value="tostring">Converto to string</option>
+          <option value="extract">Extract [re]</option>
+          <option value="reducing">Reducing [map]</option>
+          <option value="dummies">Dummies</option>
+          </select>
+        </td>
+        </tr>
+       {% endfor %}
+      </form>
+      </table>
+{% endblock %}

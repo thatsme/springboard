@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+ 
+{% block container %}
+      <table border = 0>
+         <tr color="grey">
+            <th>Name</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+         <td colspan="2"><hr style="height:3px;background-color:chocolate;border:none;"></td>
+        </tr>
+         {% for key, value in result.items() %}
+            <tr>
+               <th> {{ key }} </th>
+               <td> {{ value }} </td>
+            </tr>
+            <tr>
+               <td colspan="2"><hr style="height:3px;background-color:black;border:none;"></td>
+           </tr>   
+         {% endfor %}
+     </table>
+{% endblock %}

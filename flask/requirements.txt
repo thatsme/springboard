@@ -11,3 +11,4 @@ matplotlib
 seaborn
 sklearn
 xgboost
+pyyaml

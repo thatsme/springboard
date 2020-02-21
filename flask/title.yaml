@@ -1,0 +1,19 @@
+{
+"Capt" : "Officier",
+"Col" : "Officier", 
+"Major" : "Officier",
+"Jonkheer" : "Royalty",
+"Don" : "Royalty",
+"Sir" : "Royalty",
+"Dr" : "Officier",
+"Rev" : "Officier",
+"the Countess" : "Royalty",
+"Mme" : "Mrs",
+"Mlle" : "Miss",
+"Ms" : "Mrs",
+"Mr" : "Mr",
+"Mrs" : "Mrs",
+"Miss" : "Miss",
+"Master" : "Master",
+"Lady" : "Royalty"
+}

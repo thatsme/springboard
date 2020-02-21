@@ -44,6 +44,7 @@ class MlUtil:
         self.modelTestGridRun = 0
         self.modelTestRandomRun = 0
         self.features = None
+        self.featurelist = []
         self.SEED = 42                          # for reproducibility
         self.NFOLDS = 5                         # set folds for out-of-fold prediction
         #self.kf = KFold(self.ntrain, n_folds= self.NFOLDS, random_state=self.SEED)
@@ -144,7 +145,28 @@ class MlUtil:
         elif(type(v) is str):
             return v
            
-
+    def pushFeature(self, mname, mlist):
+        data = {}
+        data["name"] = mname
+        data["list"] = mlist
+        self.featurelist.append(data)
+    
+    def popFeature(self, mname):
+        find = next(item for item in self.featurelist if item["name"] == mname)
+        idx = self.featurelist.index(find)
+        self.featurelist.pop(idx)
+    
+    def setFeature(self, mname):
+        find = next(item for item in self.featurelist if item["name"] == mname)
+        self.features = find["list"]
+    
+    def getFeatures(self, mname=None):
+        if(mname):
+            return next(item for item in self.featurelist if item["name"] == mname)
+            # {'age': 7, 'name': 'Pam'}
+        else:
+            pass        
+        
         
     def getList(self, v):
         if(v[0] == "[" and v[len(v)-1] == "]"):
