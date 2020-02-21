@@ -43,23 +43,29 @@
                 <li role="separator" class="divider"></li>
                 <li><a href={{ url_for('list_input', key='test') }}>List uploaded</a></li>
                 <li role="separator" class="divider"></li>
+                <li><a href={{ url_for('split_data', key='full') }}>Split Full Data</a></li>
+                <li role="separator" class="divider"></li>                
+                <li><a href={{ url_for('list_input', key='test') }}>List uploaded</a></li>
+                <li role="separator" class="divider"></li>
                 <li><a href={{ url_for('show_dataframe', type='train', where='head',num= 5) }}>Head Train Data</a></li>
                 <li><a href={{ url_for('show_dataframe', type='test', where='head',num= 5) }}>Head Test Data</a></li>
+                <li><a href={{ url_for('show_dataframe', type='full', where='head',num= 5) }}>Head Full Data</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href={{ url_for('show_dataframe', type='train', where='tail',num= 5) }}>Tail Train Data</a></li>
                 <li><a href={{ url_for('show_dataframe', type='test', where='tail',num= 5) }}>Tail Test Data</a></li>
-                <li><a href="#">One more separated link</a></li>
+                <li><a href={{ url_for('show_dataframe', type='full', where='tail',num= 5) }}>Tail Full Data</a></li>
+                <li role="separator" class="divider"></li>                
               </ul>
             </li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Feature Engineering <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a href={{ url_for('show_text', key='info', type='train') }}>Info on Train dataframe</a></li>
-                <li><a href={{ url_for('show_text', key='dtypes', type='train') }}>Shape on Train dataframe</a></li>
+                <li><a href={{ url_for('show_text', key='dtypes', type='train') }}>Dtypes on Train dataframe</a></li>
                 <li><a href={{ url_for('show_describe', key='describe', type='train') }}>Describe on Train dataframe</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href={{ url_for('show_text', key='info', type='test') }}>Info on Test dataframe</a></li>
-                <li><a href={{ url_for('show_text', key='dtypes', type='test') }}>Shape on Test dataframe</a></li>
+                <li><a href={{ url_for('show_text', key='dtypes', type='test') }}>Dtypes on Test dataframe</a></li>
                 <li><a href={{ url_for('show_describe', key='describe', type='test') }}>Describe on Test dataframe</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href={{ url_for('column_list', type='full') }}>Column List [FULL]</a></li>
