@@ -1,0 +1,43 @@
+{% extends rr %}
+ 
+{% block container %}
+    <div class="top-pad">
+        <div class="well">
+            <table>
+                <tr>
+                <th>###</th>
+                <th>Column Name</th>
+                <th>Action</th>
+                </tr>
+                {% for pipeline_detail in pipelines %}
+                    <tr>
+                    <td><input type="checkbox" name={{ pipeline_detail["colname"]}}_check ></td>
+                    <td>{{ pipeline_detail["colname"]}}</td>
+                    <td>{{ pipeline_detail["action"]}}</td>
+                    </tr>
+                {% endfor %}
+                <form action = "http://localhost:5000/createpipelines" method = "POST">
+                <tr>
+                <td>###</td>
+                <td>
+                Colnames : 
+                 <select name="colname" width="300px">
+                {% for colname, typecol in zip( stuff["colnames"], stuff["dtypes"] ) %}
+                    <option value={{colname}} SELECTED>{{colname}} - {{typecol}}</option>
+                {% endfor %}
+                </select>
+                </td>
+                <td>
+                Action : 
+                 <select name="action" width="300px">
+                {% for action in stuff["actions"] %}
+                    <option value={{action["name"]}} SELECTED>{{action["value"]}}</option>
+                {% endfor %}
+                </select>
+                </td>
+                </tr>
+                </form>
+            </table>
+        </div>
+    </div>
+{% endblock %}

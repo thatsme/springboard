@@ -67,6 +67,9 @@ context["show_train"] = "hide"
 context["show_test"] = "hide"
 context["show_full"] = "hide"
 
+DW_pipeline = []
+DW_content = {}
+
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -105,6 +108,14 @@ config.read('MlUtil.ini')
 
 gc = cp.ConfigParser()
 
+def DummyDWContent():
+    DW_content["colname"] = "colname"
+    DW_content["newname"] = ""
+    DW_content["prefix"] = "new_"
+    DW_content["action"] = "toint"
+    
+    DW_pipeline.append(DW_content)
+    
 def MoveUploadedFiles(src,destpath,dst):
     if(datapack["activesession"]):
         msrc = UPLOAD_FOLDER+src
@@ -192,7 +203,10 @@ def start_session():
     #return render_template('session_started.html', version=m.__version__)
     logger.debug(datapack)
     
-    return render_template('session_started.html', version=datapack)
+    try:
+        return render_template('session_started.html', version=datapack)
+    except Exception as e:
+        return render_template('tb_implemented.html', version=datapack, error=e)
 
 @app.route('/sessionstatus')
 def session_status():
@@ -207,8 +221,8 @@ def session_reset():
     
     try:
         return render_template('session_reset.html', version=datapack)
-    except:
-        return render_template('tb_implemented.html', version=datapack)
+    except Exception as e:
+        return render_template('tb_implemented.html', version=datapack, error=e)
 
 @app.route('/setsession', methods=['POST'])
 def setsession():
@@ -217,17 +231,22 @@ def setsession():
         # check if session anready exist in list 
         if(result.get('activesession') in mactive ):
             datapack["activesession"] = result.get('activesession')
-            m.setsession(datapack["activesession"])
+            
         else:
             # if not append the session to a list 
             if(len(result.get('activesession'))==36):
                 mactive.append(result.get('activesession'))
                 datapack["activesession"] = mactive[-1]
-                m.setsession(datapack["activesession"])
             else:
                 logger.debug("You must select a valid session")
                 return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
                 
+        m.setsession(datapack["activesession"])
+        ## Set plot output as image
+        m.setPlotToImage(True)
+        ## Set output folder 
+        m.setOutputFolder(OUTPUT_FOLDER)
+        
         ## After a session is set .. enable the menus 
         context["loaddata"] = "dropdown-toggle"
         context["loaddata_head"] = "dropdown"
@@ -239,8 +258,41 @@ def setsession():
     try:
         logger.debug(datapack)
         return render_template('session_started.html', version=datapack)
-    except:
-        return render_template('tb_implemented.html', version=datapack)
+    except Exception as e:
+        return render_template('tb_implemented.html', version=datapack, error=e)
+
+
+@app.route('/createpipeline/<type>, <returnpage>', methods=['GET', 'POST'])
+def create_pipeline(type, returnpage):
+    if(request.method == 'POST'):
+        pass
+            
+    elif(request.method == 'GET'):
+        DummyDWContent()
+        stuff = {}
+        colnames = m.getColumns(type)
+        dtypes = m.getDtypes(type)
+        dtypes_list = [x.name for x in dtypes]
+        #logger.debug(dtypes_list)
+        #logger.debug(colnames)
+        
+        select_actions = []
+        select_actions.append({'name':'drop', 'value':'Drop'})
+        select_actions.append({'name':'toint', 'value':'To Integer'})
+        select_actions.append({'name':'tostring', 'value':'To String'})
+        stuff["actions"] = select_actions
+        stuff["colnames"] = colnames
+        stuff["dtypes"] = dtypes_list
+                
+        try:
+            return render_template('show_pipelines.html',rr=returnpage, pipelines=DW_pipeline, stuff=stuff, zip=zip)
+        except Exception as e:
+            return render_template('tb_implemented.html', version=datapack, error=e)
+
+    else:
+        logger.debug("Illegal Method")
+        return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
+            
 
 @app.route('/splitdata/<key>')
 def split_data(key):
@@ -276,8 +328,8 @@ def show_describe(key, type, returnpage):
 
     try:
         return render_template("show_describe.html", column_names=cnames, link_column="Index", row_data=rdata, zip=zip, rr=returnpage)
-    except:
-        return render_template('tb_implemented.html', version=datapack)
+    except Exception as e:
+        return render_template('tb_implemented.html', version=datapack, error=e)
 
 
 @app.route('/showlog/<key>, <returnpage>')
@@ -295,8 +347,8 @@ def show_log(key, returnpage):
         return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
     try:
         return(render_template('show_text.html', content=content, rr=returnpage))
-    except:
-        return render_template('tb_implemented.html', version=datapack)
+    except Exception as e:
+        return render_template('tb_implemented.html', version=datapack, error=e)
 
 @app.route('/showtext/<key>, <type>, <returnpage>')
 def show_text(key, type, returnpage):
@@ -352,8 +404,8 @@ def load_dictionaries():
     elif(request.method == 'GET'):
         try:
             return render_template('load_dictionaries.html')
-        except:
-            return render_template('tb_implemented.html', version=datapack)
+        except Exception as e:
+            return render_template('tb_implemented.html', version=datapack, error=e)
 
     else:
         logger.debug("Illegal Method")
@@ -383,8 +435,8 @@ def upload_file():
     elif(request.method == 'GET'):
         try:
             return render_template('upload.html')
-        except:
-            return render_template('tb_implemented.html', version=datapack)
+        except Exception as e:
+            return render_template('tb_implemented.html', version=datapack, error=e)
 
     else:
         logger.debug("Illegal Method")
@@ -403,8 +455,8 @@ def list_input():
     else:   
         try:   
             return render_template('file_list.html', your_list=list_of_files)
-        except:
-            return render_template('tb_implemented.html', version=datapack)
+        except Exception as e:
+            return render_template('tb_implemented.html', version=datapack, error=e)
 
 @app.route('/listoutput/<jolly>,<returnpage>')
 def list_output(jolly, returnpage):

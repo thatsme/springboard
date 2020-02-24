@@ -47,6 +47,8 @@ class MlUtil:
         self.featurelist = []
         self.SEED = 42                          # for reproducibility
         self.NFOLDS = 5                         # set folds for out-of-fold prediction
+        self.plot_to_image = False
+        self.OUTPUT_FOLDER = ""
         #self.kf = KFold(self.ntrain, n_folds= self.NFOLDS, random_state=self.SEED)
         # sklearn >= 0.20
         self.kf = KFold(n_splits=self.NFOLDS, random_state=self.SEED)
@@ -84,6 +86,12 @@ class MlUtil:
             "Lady" : "Royalty"
         }
 
+    def setPlotToImage(self, val):
+        self.plot_to_image = val
+        
+    def setOutputFolder(self, path):
+        self.OUTPUT_FOLDER = path
+        
     def startsession(self):
         self.uuid = uuid.uuid4()
         self.activesession = str(self.uuid)
@@ -313,6 +321,22 @@ class MlUtil:
             return self.train_data[self.features]
         else:
             return self.train_data
+
+    def getColumns(self, key):
+        if(key=="train"):
+            return self.train_data.columns.values.tolist()        
+        elif(key=="test"):
+            return self.test_data.columns.values.tolist()
+        elif(key=="full"):
+            return self.df_combined.columns.values.tolist()
+
+    def getDtypes(self, key):
+        if(key=="train"):
+            return self.train_data.dtypes.to_frame().values.tolist()        
+        elif(key=="test"):
+            return self.test_data.dtypes.to_frame().values.tolist()
+        elif(key=="full"):
+            return self.df_combined.dtypes.to_frame()[0].tolist()
 
     def getDescribe(self, key):
         if(key=="train"):
@@ -836,9 +860,23 @@ class MlUtil:
         sns.heatmap(cor,linewidths=0.1,vmax=1.0, 
             square=True, cmap=colormap, linecolor='white', annot=True)
         
-    def display_pairplots(self):
-        g = sns.pairplot(self.train_data[self.features], hue='Survived', palette = 'seismic',size=1.2,diag_kind = 'kde',diag_kws=dict(shade=True),plot_kws=dict(s=10) )
+    def display_pairplots_train(self, palette='seismic', hue="Survived"):
+        if(self.features):
+            g = sns.pairplot(self.train_data[self.features], hue=hue, palette = palette, size=1.2, diag_kind = 'kde', diag_kws=dict(shade=True), plot_kws=dict(s=10) )
+        else:
+            g = sns.pairplot(self.train_data, hue=hue, palette = palette, size=1.2, diag_kind = 'kde', diag_kws=dict(shade=True), plot_kws=dict(s=10) )
+
         g.set(xticklabels=[])
+        g.savefig(self.OUTPT_FOLDER+self.activesession+"_pairplot.png")
+
+    def display_pairplots_combined(self, palette='seismic', hue="Survived"):
+        if(self.features):
+            g = sns.pairplot(self.df_combined[self.features], hue=hue, palette = palette, size=1.2, diag_kind = 'kde', diag_kws=dict(shade=True), plot_kws=dict(s=10) )
+        else:
+            g = sns.pairplot(self.df_combined, hue=hue, palette = palette, size=1.2, diag_kind = 'kde', diag_kws=dict(shade=True), plot_kws=dict(s=10) )
+
+        g.set(xticklabels=[])
+        g.savefig(self.OUTPT_FOLDER+self.activesession+"_pairplot.png")
         
     def display_rf_importance(self):
         rfd = Display_Importance(self.feature_dataframe, 'Random Forest feature importances', 'features')        

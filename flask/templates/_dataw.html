@@ -50,6 +50,10 @@
                 <li class={{ context["show_train"] }} ><a href={{ url_for('column_list', type='train', returnpage='_dataw.html') }}>Column List [TRAIN]</a></li>
                 <li class={{ context["show_test"] }} ><a href={{ url_for('column_list', type='test', returnpage='_dataw.html') }}>Column List [TEST]</a></li>
                 <li role="separator" class="divider"></li>
+                <li class={{ context["show_train"] }} ><a href={{ url_for('create_pipeline', type='train', returnpage='_dataw.html') }}>Create/View DW Pipeline</a></li>
+                <li class={{ context["show_test"] }} ><a href={{ url_for('create_pipeline', type='test', returnpage='_dataw.html') }}>Create/View DW Pipeline</a></li>
+                <li class={{ context["show_full"] }} ><a href={{ url_for('create_pipeline', type='full', returnpage='_dataw.html') }}>Create/View DW Pipeline</a></li>
+                <li role="separator" class="divider"></li>
                 <li><a href={{ url_for('load_dictionaries', type='full', returnpage='_dataw.html') }}>Upload Dictionaries</a></li>
                 <li role="separator" class="divider"></li>
               </ul>
