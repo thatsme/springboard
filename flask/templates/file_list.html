@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends '_base.html' %}
  
 {% block container %}
     <div class="top-pad">
@@ -18,10 +18,10 @@
                 <td><a href="{{ url_for('list_columns', key=your_list_element) }}">Show</a></td>
                 <td>
                   <select name="{{ your_list_element }}" width="300px">
-                    <option value="train" SELECTED>Select type</option>
-                      <option value="train">Train data</option>
-                      <option value="test">Test data</option>
-                      <option value="full">Full data</option>
+                    <option value="" SELECTED>Select type</option>
+                    <option value="train">Train data</option>
+                    <option value="test">Test data</option>
+                    <option value="full">Full data</option>
                   </select>
                 </td>
               </tr>

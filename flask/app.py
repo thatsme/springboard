@@ -40,7 +40,7 @@ LOG_FOLDER = APP_FOLDER+'log/'
 DEFAULT_ERRORMESSAGE = "Something wrong, Check error log"
 mactive = []
 datapack = {}
-sessionlist = ["Select a session..."]
+sessionlist = ["Select a session"]
 test = "Test ...."
 #v_config = "dropdown-menu"
 #v_loaddata = "disabled"
@@ -53,12 +53,19 @@ context["config"] = "dropdown-toggle"
 context["config_head"] = "dropdown"
 context["loaddata"] = "disabled"
 context["loaddata_head"] = "disabled"
+context["datawrangling"] = "disabled"
+context["datawrangling_head"] = "disabled"
+context["dataexploration"] = "disabled"
+context["dataexploration_head"] = "disabled"
 context["featureengineering"] = "disabled"
 context["featureengineering_head"] = "disabled"
 context["fileoutput"] = "disabled"
 context["fileoutput_head"] = "disabled"
 context["ensamble"] = "disabled"
 context["ensamble_head"] = "disabled"
+context["show_train"] = "hide"
+context["show_test"] = "hide"
+context["show_full"] = "hide"
 
 def allowed_file(filename):
 	return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -98,6 +105,18 @@ config.read('MlUtil.ini')
 
 gc = cp.ConfigParser()
 
+def MoveUploadedFiles(src,destpath,dst):
+    if(datapack["activesession"]):
+        msrc = UPLOAD_FOLDER+src
+        mdst = destpath+datapack["activesession"]+"_"+dst
+        try:
+            copyfile(msrc,mdst)
+            return True
+        except:
+            logger.debug("Copy file error %s, %s", msrc, mdst)
+            return False
+            
+            
   
 def Filter(mstring, msubstr, flag): 
     if flag:
@@ -143,6 +162,18 @@ def home():
     mlist1 = Filter(mylist,sublist, exclude)
     return render_template('section_list.html', your_list=methodlist)
 
+@app.route('/featureengineering')
+def feature_engineering():
+    return render_template('feature_engineering.html')
+
+@app.route('/datawrangling')
+def data_wrangling():
+    return render_template('data_wrangling.html')
+
+@app.route('/dataexploration')
+def data_exploration():
+    return render_template('data_exploration.html')
+
 @app.route('/dummy')
 def dummy():
     return render_template('tb_implemented.html', version=datapack)
@@ -166,7 +197,18 @@ def start_session():
 @app.route('/sessionstatus')
 def session_status():
     
-    return render_template('session_started.html', version=datapack)
+    try:
+        return render_template('session_started.html', version=datapack)
+    except:
+        return render_template('tb_implemented.html', version=datapack)
+
+@app.route('/sessionreset')
+def session_reset():
+    
+    try:
+        return render_template('session_reset.html', version=datapack)
+    except:
+        return render_template('tb_implemented.html', version=datapack)
 
 @app.route('/setsession', methods=['POST'])
 def setsession():
@@ -178,10 +220,14 @@ def setsession():
             m.setsession(datapack["activesession"])
         else:
             # if not append the session to a list 
-            mactive.append(result.get('activesession'))
-            datapack["activesession"] = mactive[-1]
-            m.setsession(datapack["activesession"])
-
+            if(len(result.get('activesession'))==36):
+                mactive.append(result.get('activesession'))
+                datapack["activesession"] = mactive[-1]
+                m.setsession(datapack["activesession"])
+            else:
+                logger.debug("You must select a valid session")
+                return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
+                
         ## After a session is set .. enable the menus 
         context["loaddata"] = "dropdown-toggle"
         context["loaddata_head"] = "dropdown"
@@ -190,15 +236,19 @@ def setsession():
         logger.debug("Illegal Method")
         return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
 
-    return render_template('session_started.html', version=datapack)
+    try:
+        logger.debug(datapack)
+        return render_template('session_started.html', version=datapack)
+    except:
+        return render_template('tb_implemented.html', version=datapack)
 
 @app.route('/splitdata/<key>')
 def split_data(key):
     return render_template('tb_implemented.html')
     
  
-@app.route('/showdescribe/<key>,<type>')
-def show_describe(key, type):
+@app.route('/showdescribe/<key>,<type>, <returnpage>')
+def show_describe(key, type, returnpage):
     '''
     Fixing DataFrame.describe visualization for dataframe to list 
     plus index column as standard column
@@ -225,13 +275,13 @@ def show_describe(key, type):
     rdata = list(final)
 
     try:
-        return render_template("show_describe.html", column_names=cnames, link_column="Index", row_data=rdata, zip=zip)
+        return render_template("show_describe.html", column_names=cnames, link_column="Index", row_data=rdata, zip=zip, rr=returnpage)
     except:
         return render_template('tb_implemented.html', version=datapack)
 
 
-@app.route('/showlog/<key>')
-def show_log(key):
+@app.route('/showlog/<key>, <returnpage>')
+def show_log(key, returnpage):
     '''
     Show log file
     '''
@@ -244,17 +294,19 @@ def show_log(key):
         logger.debug("File read exception", exc_info=True)
         return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
     try:
-        return(render_template('show_text.html', content=content))
+        return(render_template('show_text.html', content=content, rr=returnpage))
     except:
         return render_template('tb_implemented.html', version=datapack)
 
-@app.route('/showtext/<key>,<type>')
-def show_text(key, type):
+@app.route('/showtext/<key>, <type>, <returnpage>')
+def show_text(key, type, returnpage):
     if(key=="info"):
         filename = OUTPUT_FOLDER+datapack["activesession"]+"_df_"+type+key+".txt"
     elif(key=="dtypes"):
         filename = OUTPUT_FOLDER+datapack["activesession"]+"_df_"+type+key+".txt"
     elif(key=="describe"):
+        filename = OUTPUT_FOLDER+datapack["activesession"]+"_df_"+type+key+".txt"
+    elif(key=="unna"):
         filename = OUTPUT_FOLDER+datapack["activesession"]+"_df_"+type+key+".txt"
     else:
         if(type=='key'):
@@ -272,7 +324,9 @@ def show_text(key, type):
         logger.debug("File read exception", exc_info=True)
         return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
 
-    return(render_template('show_text.html', content=content))
+    logger.debug(returnpage)
+    
+    return(render_template('show_text.html', content=content, rr=returnpage))
 
 @app.route('/loaddictionaries', methods=['GET', 'POST'])
 def load_dictionaries():
@@ -352,27 +406,40 @@ def list_input():
         except:
             return render_template('tb_implemented.html', version=datapack)
 
-@app.route('/listoutput/<jolly>')
-def list_output(jolly):
-    path = os.getcwd()+"/static/output"
+@app.route('/listoutput/<jolly>,<returnpage>')
+def list_output(jolly, returnpage):
+    #path = os.getcwd()+"/static/output"
     list_of_files = []
-    for filename in os.listdir(path):
+    filtered_names = []
+    filtere_by_session = []
+    for filename in os.listdir(OUTPUT_FOLDER):
         list_of_files.append(filename)
 
+    logger.debug(list_of_files)
+    logger.debug(datapack["activesession"])
+    logger.debug(returnpage)
+    logger.debug(jolly)
+    
+    
     if(len(list_of_files)==0):
         logger.warn('No files in input')
         return redirect('/')
     else:
         if(jolly=='all'):
-            filtered_names = filter(lambda item: (datapack["activesession"] in item) , list_of_files)
+            filtered_names = list(filter(lambda item: (datapack["activesession"] in item) , list_of_files))
         else:
             filtere_by_session = filter(lambda item: (datapack["activesession"] in item) , list_of_files)
-            filtered_names = filter(lambda item: (jolly in item) , filtere_by_session)
+            filtered_names = list(filter(lambda item: (jolly in item) , filtere_by_session))
 
+        
+        for i in filtered_names:
+            logger.debug(i)
+            
+        
         try:
-            return render_template('output_list.html', your_list=filtered_names)
-        except:
-            return render_template('tb_implemented.html', version=datapack)
+            return render_template('output_list.html', output_list=filtered_names, rr=returnpage)
+        except Exception as e:
+            return render_template('tb_implemented.html', version=datapack, error=e)
 
 @app.route('/generalconfig',methods = ['POST', 'GET'])
 def general_config():
@@ -402,8 +469,8 @@ def general_config():
                 
                 try:
                     return render_template('general_config.html', data=general)
-                except:
-                    return render_template('tb_implemented.html', version=datapack)
+                except Exception as e:
+                    return render_template('tb_implemented.html', version=datapack, error=e)
 
 
             except:
@@ -415,36 +482,47 @@ def general_config():
             if my_file.is_file():        
                 gc.read(dst)
             else:
-                copyfile(src, dst)
-                gc.read(dst)
+                try:
+                    copyfile(src, dst)
+                    gc.read(dst)
+                except:
+                    logger.debug("Copy file error %s, %s", src, dst)
 
             general = gc[section_grid]
             try:
-                return render_template('general_config.html', data=general)
-            except:
-                return render_template('tb_implemented.html', version=datapack)
+                return render_template('general_config.html', data=general) 
+            except Exception as e:
+                return render_template('tb_implemented.html', version=datapack, error=e)
         else:
             logger.debug("Illegal Method")
             return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
         
 @app.route('/loaddata',methods = ['POST'])
-def laoddata():
+def loaddata():
     if request.method == 'POST':
         ResetDatapack()
         result = request.form
         temp = []
         for r in result.getlist('fileselect'):
             temp.append(r)
+            #logger.info("fileselect -> *"+r+"*")
 
         for key, value in result.items():
+            logger.info("--> key *"+key+"* --> value *"+value+"*")
+            #kkey = key.split("_")[0]
             if key in temp:
                 datapack[value] = key
+                logger.info("datapack value -> *"+datapack[value]+"* datapack key -> *"+value+"*")
 
 
+        logger.info(datapack)
         # If selection in datapack contain both train and test loaded files
         # run the ML util and load files
-        if("train" in datapack and "test" in datapack):
-            if(m.loadSplittedData(UPLOAD_FOLDER+datapack["train"], UPLOAD_FOLDER+datapack["test"])):
+        if(("train" in datapack and datapack["train"] != "") and ("test" in datapack and datapack["test"] != "")):
+            MoveUploadedFiles(datapack["train"], OUTPUT_FOLDER, datapack["train"])
+            MoveUploadedFiles(datapack["test"], OUTPUT_FOLDER, datapack["test"])
+            
+            if(m.loadSplittedData(OUTPUT_FOLDER+datapack["activesession"]+"_"+datapack["train"], OUTPUT_FOLDER+datapack["activesession"]+"_"+datapack["test"])):
                 datapack["train_loaded"] = True
                 datapack["test_loaded"] = True
 
@@ -498,13 +576,51 @@ def laoddata():
                 except:
                     logger.debug("File write exception", exc_info=True)
                     return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
-                    
+                
+                # Get nunique and nan data on train and copy on session prefixed text file
+                buffer = io.StringIO()
+                na = df_train.isna().sum().to_frame(name='null')
+                un = df_train.nunique().to_frame(name='unique')
+                result = pd.concat([na, un], axis=1, sort=False)
+                result.to_string(buf=buffer)
+                
+                s = buffer.getvalue()
+                try:
+                    with open(OUTPUT_FOLDER+datapack["activesession"]+"_df_trainunna.txt", "w", encoding="utf-8") as f:  
+                        f.write(s)
+                except:
+                    logger.debug("File write exception", exc_info=True)
+                    return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
+
+                # Get nunique and nan data on train and copy on session prefixed text file
+                buffer = io.StringIO()
+                na = df_test.isna().sum().to_frame(name='null')
+                un = df_test.nunique().to_frame(name='unique')
+                result = pd.concat([na, un], axis=1, sort=False)
+                result.to_string(buf=buffer)
+                
+                s = buffer.getvalue()
+                try:
+                    with open(OUTPUT_FOLDER+datapack["activesession"]+"_df_testunna.txt", "w", encoding="utf-8") as f:  
+                        f.write(s)
+                except:
+                    logger.debug("File write exception", exc_info=True)
+                    return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
+                
+                
+            else:
+                logger.debug("Error loading Dataframes on MUtil class", exc_info=True)
+                return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
+                        
         # If selection in datapack contain single full file ( pre splitting ) 
         # run the ML util and load the file
-        elif("full" in datapack):        
-            if(m.loadSingleData(UPLOAD_FOLDER+datapack["full"])):
+        elif(("full" in datapack and datapack["full"] != "")):        
+            MoveUploadedFiles(datapack["full"], OUTPUT_FOLDER, datapack["full"])
+
+            if(m.loadSingleData(OUTPUT_FOLDER+datapack["activesession"]+"_"+datapack["full"])):
 
                 datapack["full_loaded"] = True
+                context["show_full"] = "show"
                 
                 # Copy back the dataframe and generate some statistics 
                 df = m.getCombined()
@@ -514,7 +630,7 @@ def laoddata():
                 df.info(buf=buffer)
                 s = buffer.getvalue()
                 try:
-                    with open(OUTPUT_FOLDER+datapack["activesession"]+"df_fullinfo.txt", "w", encoding="utf-8") as f:  
+                    with open(OUTPUT_FOLDER+datapack["activesession"]+"_df_fullinfo.txt", "w", encoding="utf-8") as f:  
                         f.write(s)
                 except:
                     logger.debug("File write exception", exc_info=True)
@@ -530,12 +646,35 @@ def laoddata():
                 except:
                     logger.debug("File write exception", exc_info=True)
                     return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
+                
+                
+                # Get nunique and nan data on train and copy on session prefixed text file
+                buffer = io.StringIO()
+                na = df.isna().sum().to_frame(name='null')
+                un = df.nunique().to_frame(name='unique')
+                result = pd.concat([na, un], axis=1, sort=False)
+                result.to_string(buf=buffer)
+                
+                s = buffer.getvalue()
+                try:
+                    with open(OUTPUT_FOLDER+datapack["activesession"]+"_df_fullunna.txt", "w", encoding="utf-8") as f:  
+                        f.write(s)
+                except:
+                    logger.debug("File write exception", exc_info=True)
+                    return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
 
+            else:
+                logger.debug("Error loading Dataframes on MUtil class", exc_info=True)
+                return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
         else:
             logger.error("Error, u have to select at list test/train csv or full single csv file")
             return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)       
 
         ## Enable the rest of menus after the data is loaded
+        context["datawrangling"] = "dropdown-toggle"
+        context["datawrangling_head"] = "dropdown"
+        context["dataexploration"] = "dropdown-toggle"
+        context["dataexploration_head"] = "dropdown"
         context["featureengineering"] = "dropdown-toggle"
         context["featureengineering_head"] = "dropdown"
         context["fileoutput"] = "dropdown-toggle"
@@ -544,9 +683,11 @@ def laoddata():
         context["ensamble_head"] = "dropdown"
 
         try:
+            logger.debug(context)
+            logger.debug(datapack)
             return redirect("/sessionstatus")
-        except:
-            return render_template('tb_implemented.html', version=datapack)
+        except Exception as e:
+            return render_template('tb_implemented.html', version=datapack, error=e)
 
     else:
         logger.debug("Illegal Method")
@@ -564,8 +705,8 @@ def detailmethod(key):
 
     try:
         return render_template('section_detail.html', your_list=zipped)
-    except:
-        return render_template('tb_implemented.html', version=datapack)
+    except Exception as e:
+        return render_template('tb_implemented.html', version=datapack, error=e)
 
 @app.route('/testpandas/<key>')
 def test_pandas(key):
@@ -579,8 +720,8 @@ def test_pandas(key):
     try:
         return render_template("test_pandas.html", column_names=df.columns.values, row_data=list(df.values.tolist()),
                             link_column="PassengerId", zip=zip)
-    except:
-        return render_template('tb_implemented.html', version=datapack)
+    except Exception as e:
+        return render_template('tb_implemented.html', version=datapack, error=e)
 
 @app.route('/showdataframe/<type>,<where>,<num>')
 def show_dataframe(type, where, num):
@@ -608,12 +749,12 @@ def show_dataframe(type, where, num):
     try:
         return render_template("test_pandas.html", column_names=cnames, row_data=rdata,
                            link_column="PassengerId", zip=zip)
-    except:
-        return render_template('tb_implemented.html', version=datapack)
+    except Exception as e:
+        return render_template('tb_implemented.html', version=datapack, error=e)
 
 
-@app.route('/columnlist/<type>')
-def column_list(type):
+@app.route('/columnlist/<type>,<returnpage>')
+def column_list(type, returnpage):
     if(type=="train"):
         df = m.getTrain()
         cnames = df.columns.values.tolist()
@@ -633,9 +774,9 @@ def column_list(type):
     try:
         col = zip(cnames,ctypes)
         logger.info(col)
-        return render_template("manage_columns.html", columns=col)
-    except:
-        return render_template('tb_implemented.html', version=datapack)
+        return render_template("manage_columns.html", columns=col, rr=returnpage)
+    except Exception as e:
+        return render_template('tb_implemented.html', version=datapack, error=e)
 
 @app.route('/featureseng', methods=['POST'])
 def features_eng():
@@ -668,8 +809,11 @@ def features_eng():
         ## 1) - Data Types transformations 
         ## 2) - Dropping coluns
         ## 3) - Creating a subset and updating MLUtil object 
-        
-        return render_template('form_debugger.html', result=result)
+
+        try:           
+            return render_template('form_debugger.html', result=result)
+        except Exception as e:
+            return render_template('tb_implemented.html', version=datapack, error=e)
         
     else:
         logger.debug("Illegal Method")
@@ -687,20 +831,28 @@ def list_columns(key):
     df1 = pd.DataFrame({'Colums':mlist})
     # link_column is the column that I want to add a button to
 
-    return render_template("test_pandas.html", column_names=df1.columns.values, row_data=list(df1.values.tolist()),
+    try:
+        return render_template("test_pandas.html", column_names=df1.columns.values, row_data=list(df1.values.tolist()),
                            link_column="Columns", zip=zip)
-
+    except Exception as e:
+        return render_template('tb_implemented.html', version=datapack, error=e)
 
 @app.route('/formdebugger', methods=['POST'])
 def form_debugger():
     if(request.method == 'POST'):
         result = request.form
         logger.info(result)
-        return render_template('form_debugger.html', result=result)
+        try:
+            return render_template('form_debugger.html', result=result)
+        except Exception as e:
+            return render_template('tb_implemented.html', version=datapack, error=e)
     
 @app.route('/template')
 def template():
-    return render_template('home.html')
+    try:
+        return render_template('home.html')
+    except Exception as e:
+        return render_template('tb_implemented.html', version=datapack, error=e)
 
 @app.route('/ensamble', methods=['GET', 'POST'])
 def ensamble():
@@ -713,7 +865,10 @@ def ensamble():
         logger.debug("Illegal Method")
         return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
 
-    return render_template('ensamble.html', form=form)
+    try:
+        return render_template('ensamble.html', form=form)
+    except Exception as e:
+        return render_template('tb_implemented.html', version=datapack, error=e)
 
 @app.route('/about-us/')
 def about():

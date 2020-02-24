@@ -320,7 +320,7 @@ class MlUtil:
         elif(key=="test"):
             return self.test_describe
         elif(key=="full"):
-            return self.full_describe
+            return self.combined_describe
 
     def getCombined(self):
         if(self.features):

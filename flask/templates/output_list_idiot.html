@@ -8,12 +8,14 @@
               <th>###</th>
               <th>File Name</th>
               <th>Action Type</th>
+              <th>{{ rr }}</th>
+              <th>{{ myfuckinglist }}</th>
             </tr>
             <form action = "http://localhost:5000/loaddata" method = "POST">
-            {% for your_list_element in output_list %}
+            {% for your_list_element in myfuckinglist %}
               <tr>
                 <td><input type="checkbox" name="fileselect" value={{ your_list_element }}></input><br></td>
-                <td><a href="{{ url_for('show_text', key=your_list_element, type='key', returnpage=rr ) }}">{{ your_list_element }}</a></td>
+                <td>____</td>
                 <td>
                   <select name="{{ your_list_element }}" width="300px">
                     <option value="train" SELECTED>Select action</option>
