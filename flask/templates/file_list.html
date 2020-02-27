@@ -14,8 +14,8 @@
             {% for your_list_element in your_list %}
               <tr>
                 <td><input type="checkbox" name="fileselect" value={{ your_list_element }}></input><br></td>
-                <td><a href="{{ url_for('test_pandas', key=your_list_element) }}">{{ your_list_element }}</a></td>
-                <td><a href="{{ url_for('list_columns', key=your_list_element) }}">Show</a></td>
+                <td><a href="{{ url_for('test_pandas', mkey=your_list_element) }}">{{ your_list_element }}</a></td>
+                <td><a href="{{ url_for('list_columns', mkey=your_list_element) }}">Show</a></td>
                 <td>
                   <select name="{{ your_list_element }}" width="300px">
                     <option value="" SELECTED>Select type</option>

@@ -67,6 +67,17 @@ context["show_train"] = "hide"
 context["show_test"] = "hide"
 context["show_full"] = "hide"
 
+enabled_types = []
+enabled_types.append("train")
+enabled_types.append("test")
+enabled_types.append("full")
+
+enabled_masters = []
+enabled_masters.append("_base.html")
+enabled_masters.append("_dataw.html")
+enabled_masters.append("_datae.html")
+enabled_masters.append("_featuree.html")
+
 DW_pipeline = []
 DW_content = {}
 
@@ -108,15 +119,27 @@ config.read('MlUtil.ini')
 
 gc = cp.ConfigParser()
 
+def CheckTypes(type):
+    if(type in enabled_types):
+        return True
+    return False
+
+def CheckMasters(type):
+    if(type in enabled_masters):
+        return True
+    return False
+
 def DummyDWContent():
+    DW_content = {}
     DW_content["colname"] = "colname"
     DW_content["newname"] = ""
     DW_content["prefix"] = "new_"
     DW_content["action"] = "toint"
+    DW_content["actioname"] = "To Integer"
     
     DW_pipeline.append(DW_content)
     
-def MoveUploadedFiles(src,destpath,dst):
+def MoveUploadedFiles(src, destpath, dst):
     if(datapack["activesession"]):
         msrc = UPLOAD_FOLDER+src
         mdst = destpath+datapack["activesession"]+"_"+dst
@@ -261,46 +284,205 @@ def setsession():
     except Exception as e:
         return render_template('tb_implemented.html', version=datapack, error=e)
 
-
-@app.route('/createpipeline/<type>, <returnpage>', methods=['GET', 'POST'])
-def create_pipeline(type, returnpage):
+@app.route('/updatepipeline', methods=['POST'])
+def update_pipeline():
     if(request.method == 'POST'):
-        pass
-            
-    elif(request.method == 'GET'):
-        DummyDWContent()
-        stuff = {}
-        colnames = m.getColumns(type)
-        dtypes = m.getDtypes(type)
-        dtypes_list = [x.name for x in dtypes]
-        #logger.debug(dtypes_list)
-        #logger.debug(colnames)
+        result = request.form
+        tempcolname = []
+        tempaction = []
+        vvalue = {}
+        DW_content = {}
+        for r in result.getlist('colname'):
+            tempcolname.append(r)
+            #logger.info("fileselect -> *"+r+"*")
+
+        for r in result.getlist('action'):
+            tempaction.append(r)
+            #logger.info("fileselect -> *"+r+"*")
+
+        logger.info(tempcolname)
+        logger.info(tempaction)
         
+        for key, value in result.items():
+            logger.info("--> key *"+key+"* --> value *"+value+"*")
+            #kkey = key.split("_")[0]
+            if value in tempcolname:
+                logger.info("vvalue value -> *"+value+"* vvalue key -> *"+key+"*"+key)    
+                DW_content[key] = value
+                        
+            if value in tempaction:
+                logger.info("vvalue value -> *"+value+"* vvalue key -> *"+key+"*"+key)            
+                DW_content[key] = value
+                #DW_content["actionname"] = 
+
+        DW_pipeline.append(DW_content)
+        #logger.info(DW_pipeline)
+        #logger.info(result.get("mtype"))
+        #logger.info(result.get("returnpage"))
+        
+        stuff = {}
+        colnames = m.getColumns(result.get("mtype"))
+        dtypes = m.getDtypes(result.get("mtype"))
+        dtypes_list = [x.name for x in dtypes]
+        colnames_list = [x.ljust(10,' ') for x in colnames]
+                    
         select_actions = []
         select_actions.append({'name':'drop', 'value':'Drop'})
         select_actions.append({'name':'toint', 'value':'To Integer'})
         select_actions.append({'name':'tostring', 'value':'To String'})
         stuff["actions"] = select_actions
-        stuff["colnames"] = colnames
+        stuff["colnames"] = colnames_list
         stuff["dtypes"] = dtypes_list
-                
+        stuff["mtype"] = result.get("mtype")
+
+        
         try:
-            return render_template('show_pipelines.html',rr=returnpage, pipelines=DW_pipeline, stuff=stuff, zip=zip)
+            return render_template('show_pipelines.html',rr=result.get("returnpage"), pipelines=DW_pipeline, stuff=stuff, zip=zip)
         except Exception as e:
             return render_template('tb_implemented.html', version=datapack, error=e)
 
     else:
         logger.debug("Illegal Method")
         return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
+
+@app.route('/runepipeline', methods=['POST'])
+def run_pipeline():
+    if(request.method == 'POST'):
+        result = request.form
+        tempcolname = []
+        tempaction = []
+        vvalue = {}
+        DW_content = {}
+        for r in result.getlist('colname'):
+            tempcolname.append(r)
+            #logger.info("fileselect -> *"+r+"*")
+
+        for r in result.getlist('action'):
+            tempaction.append(r)
+            #logger.info("fileselect -> *"+r+"*")
+
+        logger.info(tempcolname)
+        logger.info(tempaction)
+        
+        for key, value in result.items():
+            logger.info("--> key *"+key+"* --> value *"+value+"*")
+            #kkey = key.split("_")[0]
+            if value in tempcolname:
+                logger.info("vvalue value -> *"+value+"* vvalue key -> *"+key+"*"+key)    
+                DW_content[key] = value
+                        
+            if value in tempaction:
+                logger.info("vvalue value -> *"+value+"* vvalue key -> *"+key+"*"+key)            
+                DW_content[key] = value
+                #DW_content["actionname"] = 
+
+        DW_pipeline.append(DW_content)
+        #logger.info(DW_pipeline)
+        #logger.info(result.get("mtype"))
+        #logger.info(result.get("returnpage"))
+        
+        stuff = {}
+        colnames = m.getColumns(result.get("mtype"))
+        dtypes = m.getDtypes(result.get("mtype"))
+        dtypes_list = [x.name for x in dtypes]
+        colnames_list = [x.ljust(10,' ') for x in colnames]
+                    
+        select_actions = []
+        select_actions.append({'name':'drop', 'value':'Drop'})
+        select_actions.append({'name':'toint', 'value':'To Integer'})
+        select_actions.append({'name':'tostring', 'value':'To String'})
+        stuff["actions"] = select_actions
+        stuff["colnames"] = colnames_list
+        stuff["dtypes"] = dtypes_list
+        stuff["mtype"] = result.get("mtype")
+
+        
+        try:
+            return render_template('show_pipelines.html',rr=result.get("returnpage"), pipelines=DW_pipeline, stuff=stuff, zip=zip)
+        except Exception as e:
+            return render_template('tb_implemented.html', version=datapack, error=e)
+
+    else:
+        logger.debug("Illegal Method")
+        return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
+
+
+@app.route('/createpipeline/<mtype>, <returnpage>', methods=['GET', 'POST'])
+def create_pipeline(mtype, returnpage):
+    if(CheckTypes(mtype) and CheckMasters(returnpage)):
+                        
+        if(request.method == 'GET'):
+            #DummyDWContent()
+            stuff = {}
+            colnames = m.getColumns(mtype)
+            dtypes = m.getDtypes(mtype)
+            dtypes_list = [x.name for x in dtypes]
+            #colnames_list = [x.ljust(15,'_') for x in colnames]
+            
+            
+            select_actions = []
+            select_actions.append({'name':'drop', 'value':'Drop'})
+            select_actions.append({'name':'toint', 'value':'To Integer'})
+            select_actions.append({'name':'tostring', 'value':'To String'})
+            stuff["actions"] = select_actions
+            stuff["colnames"] = colnames
+            stuff["dtypes"] = dtypes_list
+            stuff["mtype"] = mtype
+                    
+            try:
+                return render_template('show_pipelines.html',rr=returnpage, pipelines=DW_pipeline, stuff=stuff, zip=zip)
+            except Exception as e:
+                return render_template('tb_implemented.html', version=datapack, error=e)
+
+        else:
+            logger.debug("Illegal Method")
+            return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
+    else:
+        logger.debug("GET proibited parameters")
+        return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
+
+@app.route('/preparepipeline/<mtype>, <returnpage>', methods=['GET', 'POST'])
+def prepare_pipeline(mtype, returnpage):
+    if(CheckTypes(mtype) and CheckMasters(returnpage)):
+                        
+        if(request.method == 'GET'):
+            #DummyDWContent()
+            stuff = {}
+            colnames = m.getColumns(mtype)
+            dtypes = m.getDtypes(mtype)
+            dtypes_list = [x.name for x in dtypes]
+            #colnames_list = [x.ljust(15,'_') for x in colnames]
+            
+            
+            select_actions = []
+            select_actions.append({'name':'drop', 'value':'Drop'})
+            select_actions.append({'name':'toint', 'value':'To Integer'})
+            select_actions.append({'name':'tostring', 'value':'To String'})
+            stuff["actions"] = select_actions
+            stuff["colnames"] = colnames
+            stuff["dtypes"] = dtypes_list
+            stuff["mtype"] = mtype
+                    
+            try:
+                return render_template('prepare_pipelines.html',rr=returnpage, pipelines=DW_pipeline, stuff=stuff, zip=zip)
+            except Exception as e:
+                return render_template('tb_implemented.html', version=datapack, error=e)
+
+        else:
+            logger.debug("Illegal Method")
+            return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
+    else:
+        logger.debug("GET proibited parameters")
+        return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
             
 
-@app.route('/splitdata/<key>')
-def split_data(key):
+@app.route('/splitdata/<mkey>')
+def split_data(mkey):
     return render_template('tb_implemented.html')
     
  
-@app.route('/showdescribe/<key>,<type>, <returnpage>')
-def show_describe(key, type, returnpage):
+@app.route('/showdescribe/<mkey>,<mtype>, <returnpage>')
+def show_describe(mkey, mtype, returnpage):
     '''
     Fixing DataFrame.describe visualization for dataframe to list 
     plus index column as standard column
@@ -332,8 +514,10 @@ def show_describe(key, type, returnpage):
         return render_template('tb_implemented.html', version=datapack, error=e)
 
 
-@app.route('/showlog/<key>, <returnpage>')
-def show_log(key, returnpage):
+@app.route('/showlog/<mkey>, <returnpage>')
+def show_log(mkey, returnpage):
+
+
     '''
     Show log file
     '''
@@ -350,35 +534,43 @@ def show_log(key, returnpage):
     except Exception as e:
         return render_template('tb_implemented.html', version=datapack, error=e)
 
-@app.route('/showtext/<key>, <type>, <returnpage>')
-def show_text(key, type, returnpage):
-    if(key=="info"):
-        filename = OUTPUT_FOLDER+datapack["activesession"]+"_df_"+type+key+".txt"
-    elif(key=="dtypes"):
-        filename = OUTPUT_FOLDER+datapack["activesession"]+"_df_"+type+key+".txt"
-    elif(key=="describe"):
-        filename = OUTPUT_FOLDER+datapack["activesession"]+"_df_"+type+key+".txt"
-    elif(key=="unna"):
-        filename = OUTPUT_FOLDER+datapack["activesession"]+"_df_"+type+key+".txt"
-    else:
-        if(type=='key'):
-            filename = OUTPUT_FOLDER+key
+@app.route('/showtext/<mkey>, <mtype>, <returnpage>')
+def show_text(mkey, mtype, returnpage):
+    if(CheckTypes(mtype) and CheckMasters(returnpage)):
+        if(mkey=="info"):
+            filename = OUTPUT_FOLDER+datapack["activesession"]+"_df_"+mtype+mkey+".txt"
+        elif(mkey=="dtypes"):
+            filename = OUTPUT_FOLDER+datapack["activesession"]+"_df_"+mtype+mkey+".txt"
+        elif(mkey=="describe"):
+            filename = OUTPUT_FOLDER+datapack["activesession"]+"_df_"+mtype+mkey+".txt"
+        elif(mkey=="unna"):
+            filename = OUTPUT_FOLDER+datapack["activesession"]+"_df_"+mtype+mkey+".txt"
         else:
+            if(mtype=='key'):
+                filename = OUTPUT_FOLDER+mkey
+            else:
 
-            logger.debug("Missing key value")
+                logger.debug("Missing key value")
+                return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
+
+        try:
+            logger.info("File to open %s %s ", filename, mkey)
+            with open(filename, "r") as f:
+                content = f.read()
+        except:
+            logger.debug("File read exception", exc_info=True)
             return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
 
-    try:
-        logger.info("File to open %s %s ", filename, key)
-        with open(filename, "r") as f:
-            content = f.read()
-    except:
-        logger.debug("File read exception", exc_info=True)
-        return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
+        logger.debug(returnpage)
 
-    logger.debug(returnpage)
-    
-    return(render_template('show_text.html', content=content, rr=returnpage))
+        try:        
+            return(render_template('show_text.html', content=content, rr=returnpage))
+        except Exception as e:
+            return render_template('tb_implemented.html', version=datapack, error=e)
+
+    else:
+        logger.debug("GET proibited parameters")
+        return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
 
 @app.route('/loaddictionaries', methods=['GET', 'POST'])
 def load_dictionaries():
@@ -482,11 +674,6 @@ def list_output(jolly, returnpage):
         else:
             filtere_by_session = filter(lambda item: (datapack["activesession"] in item) , list_of_files)
             filtered_names = list(filter(lambda item: (jolly in item) , filtere_by_session))
-
-        
-        for i in filtered_names:
-            logger.debug(i)
-            
         
         try:
             return render_template('output_list.html', output_list=filtered_names, rr=returnpage)
@@ -745,12 +932,12 @@ def loaddata():
         logger.debug("Illegal Method")
         return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
 
-@app.route('/detail/<key>')
-def detailmethod(key):
+@app.route('/detail/<mkey>')
+def detailmethod(mkey):
     mkeys = []
     mval = []
-    for keys in config[key]:  
-        mval.append(config[key][keys])
+    for keys in config[mkey]:  
+        mval.append(config[mkey][keys])
         mkeys.append(keys)
 
     zipped = zip(mkeys, mval)
@@ -760,11 +947,11 @@ def detailmethod(key):
     except Exception as e:
         return render_template('tb_implemented.html', version=datapack, error=e)
 
-@app.route('/testpandas/<key>')
-def test_pandas(key):
+@app.route('/testpandas/<mkey>')
+def test_pandas(mkey):
 
     try:
-        df = pd.read_csv(INPUT_FOLDER+key)
+        df = pd.read_csv(INPUT_FOLDER+mkey)
     except:
         logger.debug("File read exception", exc_info=True)
 
@@ -775,9 +962,10 @@ def test_pandas(key):
     except Exception as e:
         return render_template('tb_implemented.html', version=datapack, error=e)
 
-@app.route('/showdataframe/<type>,<where>,<num>')
-def show_dataframe(type, where, num):
-    if(type=="train"):
+@app.route('/showdataframe/<mtype>,<where>,<num>')
+def show_dataframe(mtype, where, num):
+    # Da rivedere completamente
+    if(mtype=="train"):
         df = m.getTrain()
         cnames = df.columns.values
         if(where=="head"):
@@ -785,7 +973,7 @@ def show_dataframe(type, where, num):
         else:
             rdata = list(df.tail(int(num)).values.tolist())
 
-    elif(type=="test"):
+    elif(mtype=="test"):
         df = m.getTest()
         cnames = df.columns.values
         if(where=="head"):
@@ -794,7 +982,7 @@ def show_dataframe(type, where, num):
             rdata = list(df.tail(int(num)).values.tolist())
 
     else:
-        logger.debug("Wrong dataframe type %s", type)
+        logger.debug("Wrong dataframe type %s", mtype)
         return("")
 
     # link_column is the column that I want to add a button to
@@ -805,22 +993,22 @@ def show_dataframe(type, where, num):
         return render_template('tb_implemented.html', version=datapack, error=e)
 
 
-@app.route('/columnlist/<type>,<returnpage>')
-def column_list(type, returnpage):
-    if(type=="train"):
+@app.route('/columnlist/<mtype>,<returnpage>')
+def column_list(mtype, returnpage):
+    if(mtype=="train"):
         df = m.getTrain()
         cnames = df.columns.values.tolist()
         ctypes = df.dtypes.tolist()
-    elif(type=="test"):
+    elif(mtype=="test"):
         df = m.getTest()
         cnames = df.columns.values.tolist()
         ctypes = df.dtypes.tolist()
-    elif(type=="full"):
+    elif(mtype=="full"):
         df = m.getCombined()
         cnames = df.columns.values.tolist()
         ctypes = df.dtypes.tolist()
     else:
-        logger.debug("Wrong dataframe type %s", type)
+        logger.debug("Wrong dataframe type %s", mtype)
         return("")
 
     try:
@@ -871,8 +1059,8 @@ def features_eng():
         logger.debug("Illegal Method")
         return render_template('show_error.html', content=DEFAULT_ERRORMESSAGE)   
     
-@app.route('/listcolumns/<key>')
-def list_columns(key):
+@app.route('/listcolumns/<mkey>')
+def list_columns(mkey):
 
     try:
         df = pd.read_csv(INPUT_FOLDER+key)

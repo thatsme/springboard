@@ -7,10 +7,10 @@
             <th>Value</th>
         </tr>
         <form action = "http://localhost:5000/generalconfig" method = "POST">
-         {% for key, value in data.items() %}
+         {% for mkey, mvalue in data.items() %}
             <tr>
                <th> {{ key }} </th>
-               <td><input type="input" name={{ key }} value={{ value }}></input> </td>
+               <td><input type="input" name={{ mkey }} value={{ mvalue }}></input> </td>
             </tr>
          {% endfor %}
          <tr><td colspan="4"><input type="submit" value="Change General Config"></td></tr>

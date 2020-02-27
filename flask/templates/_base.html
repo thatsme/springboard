@@ -27,44 +27,44 @@
             <li class={{ context["config"] }}>
               <a href="#" class={{ context["config_head"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Config <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href={{ url_for('start_session', key='full') }}>Start new Session</a></li>
+                <li><a href={{ url_for('start_session', mkey='full') }}>Start new Session</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('session_status', key='full') }}>Session Status</a></li>
+                <li><a href={{ url_for('session_status', mkey='full') }}>Session Status</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="#">{{ context["session"][-1] }}</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('session_reset', key='full') }}>Reset Session</a></li>
+                <li><a href={{ url_for('session_reset', mkey='full') }}>Reset Session</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('general_config', key='full') }}>General Config</a></li>
+                <li><a href={{ url_for('general_config', mkey='full') }}>General Config</a></li>
               </ul>
             </li>
             <li class={{ context["loaddata_head"] }}>
               <a href="#" class={{ context["loaddata"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Load Data <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href={{ url_for('upload_file', key='full') }}>Upload File</a></li>
+                <li><a href={{ url_for('upload_file', mkey='full') }}>Upload File</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('list_input', key='test') }}>List uploaded</a></li>
+                <li><a href={{ url_for('list_input', mkey='test') }}>List uploaded</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('split_data', key='full') }}>Split Full Data</a></li>
+                <li><a href={{ url_for('split_data', mkey='full') }}>Split Full Data</a></li>
                 <li role="separator" class="divider"></li>                
-                <li><a href={{ url_for('dummy', key='test') }}>TBD</a></li>
+                <li><a href={{ url_for('dummy', mkey='test') }}>TBD</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('show_dataframe', type='train', where='head',num= 5) }}>Head Train Data</a></li>
-                <li><a href={{ url_for('show_dataframe', type='test', where='head',num= 5) }}>Head Test Data</a></li>
-                <li><a href={{ url_for('show_dataframe', type='full', where='head',num= 5) }}>Head Full Data</a></li>
+                <li><a href={{ url_for('show_dataframe', mtype='train', where='head',num= 5) }}>Head Train Data</a></li>
+                <li><a href={{ url_for('show_dataframe', mtype='test', where='head',num= 5) }}>Head Test Data</a></li>
+                <li><a href={{ url_for('show_dataframe', mtype='full', where='head',num= 5) }}>Head Full Data</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('show_dataframe', type='train', where='tail',num= 5) }}>Tail Train Data</a></li>
-                <li><a href={{ url_for('show_dataframe', type='test', where='tail',num= 5) }}>Tail Test Data</a></li>
-                <li><a href={{ url_for('show_dataframe', type='full', where='tail',num= 5) }}>Tail Full Data</a></li>
+                <li><a href={{ url_for('show_dataframe', mtype='train', where='tail',num= 5) }}>Tail Train Data</a></li>
+                <li><a href={{ url_for('show_dataframe', mtype='test', where='tail',num= 5) }}>Tail Test Data</a></li>
+                <li><a href={{ url_for('show_dataframe', mtype='full', where='tail',num= 5) }}>Tail Full Data</a></li>
                 <li role="separator" class="divider"></li>                
               </ul>
             </li>
 
-            <li class={{ context["datawrangling_head"] }}><a href={{ url_for('data_wrangling', key='show_menu') }}>Data Wrangling</a></li>
+            <li class={{ context["datawrangling_head"] }}><a href={{ url_for('data_wrangling', mkey='show_menu') }}>Data Wrangling</a></li>
 
-            <li class={{ context["dataexploration_head"] }}><a href={{ url_for('data_exploration', key='show_menu') }}>Data Exploration</a></li>
+            <li class={{ context["dataexploration_head"] }}><a href={{ url_for('data_exploration', mkey='show_menu') }}>Data Exploration</a></li>
 
-            <li class={{ context["featureengineering_head"] }}><a href={{ url_for('feature_engineering', key='show_menu') }}>Feature Engineering</a></li>
+            <li class={{ context["featureengineering_head"] }}><a href={{ url_for('feature_engineering', mkey='show_menu') }}>Feature Engineering</a></li>
 
             <li class={{ context["fileoutput_head"] }}>
               <a href="#" class={{ context["fileoutput"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">File Output <span class="caret"></span></a>
@@ -88,13 +88,13 @@
             <li class={{ context["ensamble_head"] }}>
               <a href="#" class={{ context["ensamble"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Ensamble <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href={{ url_for('detailmethod', key='RandomForestClassifier') }}>RandomForestClassifier</a></li>
-                <li><a href={{ url_for('detailmethod', key='ExtraTreesRegressor') }}>ExtraTreesRegressor</a></li>
-                <li><a href={{ url_for('detailmethod', key='ExtraTreesClassifier') }}>ExtraTreesClassifier</a></li>
-                <li><a href={{ url_for('detailmethod', key='AdaBoostClassifier') }}>AdaBoostClassifier</a></li>
-                <li><a href={{ url_for('detailmethod', key='GradientBoostingClassifier') }}>GradientBoostingClassifier</a></li>
-                <li><a href={{ url_for('detailmethod', key='SVM') }}>SVM</a></li>
-                <li><a href={{ url_for('detailmethod', key='XGBoost') }}>XGBoost</a></li>
+                <li><a href={{ url_for('detailmethod', mkey='RandomForestClassifier') }}>RandomForestClassifier</a></li>
+                <li><a href={{ url_for('detailmethod', mkey='ExtraTreesRegressor') }}>ExtraTreesRegressor</a></li>
+                <li><a href={{ url_for('detailmethod', mkey='ExtraTreesClassifier') }}>ExtraTreesClassifier</a></li>
+                <li><a href={{ url_for('detailmethod', mkey='AdaBoostClassifier') }}>AdaBoostClassifier</a></li>
+                <li><a href={{ url_for('detailmethod', mkey='GradientBoostingClassifier') }}>GradientBoostingClassifier</a></li>
+                <li><a href={{ url_for('detailmethod', mkey='SVM') }}>SVM</a></li>
+                <li><a href={{ url_for('detailmethod', mkey='XGBoost') }}>XGBoost</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="#">Insert New</a></li>
                 <li role="separator" class="divider"></li>
@@ -116,7 +116,7 @@
           </form>
           <ul class="nav navbar-nav navbar-right">
             <li class="active"><a href="#">API (External) <span class="sr-only">(current)</span></a></li>
-            <li><a href={{ url_for('show_log', key='show_log', returnpage='_base.html') }}>Show Log</a></li>
+            <li><a href={{ url_for('show_log', mkey='show_log', returnpage='_base.html') }}>Show Log</a></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Help <span class="caret"></span></a>
               <ul class="dropdown-menu">

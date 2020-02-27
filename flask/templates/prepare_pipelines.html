@@ -16,25 +16,12 @@
                     <td>{{ pipeline_detail["action"]}}</td>
                     </tr>
                 {% endfor %}
-                <form action = "http://localhost:5000/runepipeline" method = "POST">
+                <form action = "http://localhost:5000/updatepipeline" method = "POST">
                 <tr><td colspan="3"><hr></tr>
                 <tr>
                 <td>###</td>
                 <td>
-                Colnames : 
-                 <select name="colname" width="300px">
-                {% for colname, typecol in zip( stuff["colnames"], stuff["dtypes"] ) %}
-                    <option value={{colname}} SELECTED>{{colname}} - {{typecol}}</option>
-                {% endfor %}
-                </select>
-                </td>
-                <td>
-                Action : 
-                 <select name="action" width="300px">
-                {% for action in stuff["actions"] %}
-                    <option value={{action["name"]}} SELECTED>{{action["value"]}}</option>
-                {% endfor %}
-                </select>
+                Pipeline Name : <input type="text" name="pipelinename">
                 </td>
                 </tr>
                 <tr>
@@ -42,7 +29,7 @@
                 <td colspan="3">
                 <input type="hidden" name="returnpage" value={{rr}}>
                 <input type="hidden" name="mtype" value={{stuff["mtype"]}}>
-                <input type="submit" value="Insert new Element in Pipeline">
+                <input type="submit" value="Run the Pipeline">
                 </tr>
                 </form>
             </table>
