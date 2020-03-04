@@ -27,13 +27,13 @@
             <li class={{ context["config"] }}>
               <a href="#" class={{ context["config_head"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Config <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href={{ url_for('start_session', mkey='full') }}>Start new Session</a></li>
+                <li><a href={{ url_for('sessions.start_session', mkey='full') }}>Start new Session</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('session_status', mkey='full') }}>Session Status</a></li>
+                <li><a href={{ url_for('sessions.session_status', mkey='full') }}>Session Status</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="#">{{ context["session"][-1] }}</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('session_reset', mkey='full') }}>Reset Session</a></li>
+                <li><a href={{ url_for('sessions.session_reset', mkey='full') }}>Reset Session</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href={{ url_for('general_config', mkey='full') }}>General Config</a></li>
               </ul>
@@ -41,9 +41,9 @@
             <li class={{ context["loaddata_head"] }}>
               <a href="#" class={{ context["loaddata"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Load Data <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href={{ url_for('upload_file', mkey='full') }}>Upload File</a></li>
+                <li><a href={{ url_for('files.upload_file', mkey='full') }}>Upload File</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('list_input', mkey='test') }}>List uploaded</a></li>
+                <li><a href={{ url_for('files.list_input', mkey='test') }}>List uploaded</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href={{ url_for('split_data', mkey='full') }}>Split Full Data</a></li>
                 <li role="separator" class="divider"></li>                
@@ -60,7 +60,7 @@
               </ul>
             </li>
 
-            <li class={{ context["datawrangling_head"] }}><a href={{ url_for('data_wrangling', mkey='show_menu') }}>Data Wrangling</a></li>
+            <li class={{ context["datawrangling_head"] }}><a href={{ url_for('datawrangling.data_wrangling', mkey='show_menu') }}>Data Wrangling</a></li>
 
             <li class={{ context["dataexploration_head"] }}><a href={{ url_for('data_exploration', mkey='show_menu') }}>Data Exploration</a></li>
 
@@ -69,18 +69,18 @@
             <li class={{ context["fileoutput_head"] }}>
               <a href="#" class={{ context["fileoutput"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">File Output <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href={{ url_for('list_output', jolly='all', returnpage='_base.html') }}>All Files by Session</a></li>
-                <li><a href={{ url_for('list_output', jolly='general_config', returnpage='_base.html') }}>General Config by Session</a></li>
-                <li><a href={{ url_for('list_output', jolly='dict', returnpage='_base.html') }}>Dictionary Files by Session</a></li>
-                <li><a href={{ url_for('list_output', jolly='plot', returnpage='_base.html') }}>Plots by Session</a></li>
-                <li><a href={{ url_for('list_output', jolly='info', returnpage='_base.html') }}>Dataframe Info by Session</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='all', returnpage='_base.html') }}>All Files by Session</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='general_config', returnpage='_base.html') }}>General Config by Session</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='dict', returnpage='_base.html') }}>Dictionary Files by Session</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='plot', returnpage='_base.html') }}>Plots by Session</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='info', returnpage='_base.html') }}>Dataframe Info by Session</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('list_output', jolly='tbd', returnpage='_base.html') }}>TBD</a></li>
-                <li><a href={{ url_for('list_output', jolly='tbd', returnpage='_base.html') }}>TBD</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='tbd', returnpage='_base.html') }}>TBD</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='tbd', returnpage='_base.html') }}>TBD</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('list_output', jolly='tbd', returnpage='_base.html') }}>TBD</a></li>
-                <li><a href={{ url_for('list_output', jolly='tbd', returnpage='_base.html') }}>TBD</a></li>
-                <li><a href={{ url_for('list_output', jolly='tbd', returnpage='_base.html') }}>TBD</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='tbd', returnpage='_base.html') }}>TBD</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='tbd', returnpage='_base.html') }}>TBD</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='tbd', returnpage='_base.html') }}>TBD</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="#">One more separated link</a></li>
               </ul>
@@ -116,7 +116,7 @@
           </form>
           <ul class="nav navbar-nav navbar-right">
             <li class="active"><a href="#">API (External) <span class="sr-only">(current)</span></a></li>
-            <li><a href={{ url_for('show_log', mkey='show_log', returnpage='_base.html') }}>Show Log</a></li>
+            <li><a href={{ url_for('files.show_log', mkey='show_log', returnpage='_base.html') }}>Show Log</a></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Help <span class="caret"></span></a>
               <ul class="dropdown-menu">

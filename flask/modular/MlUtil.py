@@ -12,6 +12,7 @@ from sklearn.ensemble import RandomForestClassifier, ExtraTreesRegressor, ExtraT
 from sklearn.svm import SVC
 import xgboost as xgb
 import uuid
+from flask import Blueprint
 
 #from SklearnHelper import SklearnHelper
 #import SklearnHelper
@@ -30,12 +31,12 @@ def check_name(f):
     return wrapper
 
 
-class MlUtil:
+class MlUtil():
 # class that implements titanic EDA and Model
 
     # constructor
     def __init__(self, train=None, test=None, vb=0, model=None):
-        
+                    
         self.verbose = vb
         ## Version 2 modified for Flask usage
         self.__version__ = "2.3.06"

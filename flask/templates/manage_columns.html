@@ -23,7 +23,7 @@
         </tr>
         {% for column, type in columns %}
         <tr>
-        <td><a href="{{ url_for('detailmethod', key=your_list_element) }}">{{ column }}</a></td>
+        <td><a href="{{ url_for('detailmethod', mkey=your_list_element) }}">{{ column }}</a></td>
         <td>{{ type }}</td>
         <td><input type="text" name="{{ column }}_prefix" size="5"></td>
         <td><input type="text" name="{{ column }}_new" size="10"></td>

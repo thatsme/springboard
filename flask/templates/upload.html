@@ -2,7 +2,7 @@
 
 {% block container %}
 
-<h2>Select a file to upload</h2>
+<h2>Select a file to upload ( multiple allowes )</h2>
 <p>
 	{% with messages = get_flashed_messages() %}
 	  {% if messages %}
@@ -17,7 +17,7 @@
 <form method="post" action="/upload" enctype="multipart/form-data">
     <dl>
 		<p>
-			<input type="file" name="file" autocomplete="off" required>
+			<input type="file" name="file[]" multiple='' autocomplete="off" required>
 		</p>
     </dl>
     <p>

@@ -13,13 +13,13 @@
             {% for your_list_element in output_list %}
               <tr>
                 <td><input type="checkbox" name="fileselect" value={{ your_list_element }}></input><br></td>
-                <td><a href="{{ url_for('show_text', mkey=your_list_element, mtype='key', returnpage=rr ) }}">{{ your_list_element }}</a></td>
+                <td><a href="{{ url_for('datawrangling.show_text', mkey=your_list_element, mtype='freecontent', returnpage=rr, action='show' ) }}">{{ your_list_element }}</a></td>
                 <td>
                   <select name="{{ your_list_element }}" width="300px">
-                    <option value="train" SELECTED>Select action</option>
-                      <option value="train">Action 1</option>
-                      <option value="test">Action 2</option>
-                      <option value="full">Action 2</option>
+                    <option value="show" SELECTED>Show the content</option>
+                      <option value="save">Save locally</option>
+                      <option value="action2">Action 2</option>
+                      <option value="action3">Action 2</option>
                   </select>
                 </td>
               </tr>

@@ -27,17 +27,27 @@
             <li class={{ context["featureengineering_head"] }}>
               <a href="#" class={{ context["featureengineering"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Feature Engineering <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href={{ url_for('show_text', mkey='info', mtype='train', returnpage='_featuree.html') }}>Info on Train dataframe</a></li>
-                <li><a href={{ url_for('show_text', mkey='dtypes', mtype='train', returnpage='_featuree.html') }}>Dtypes on Train dataframe</a></li>
-                <li><a href={{ url_for('show_describe', mkey='describe', mtype='train', returnpage='_featuree.html') }}>Describe on Train dataframe</a></li>
+                <li class={{ context["show_train"] }}><a href={{ url_for('datawrangling.show_text', mkey='info', mtype='train', returnpage='_featuree.html', action='show') }}>Info on Train dataframe</a></li>
+                <li class={{ context["show_train"] }}><a href={{ url_for('datawrangling.show_text', mkey='dtypes', mtype='train', returnpage='_featuree.html', action='show') }}>Dtypes on Train dataframe</a></li>
+                <li class={{ context["show_train"] }}><a href={{ url_for('datawrangling.show_describe', mkey='describe', mtype='train', returnpage='_featuree.html') }}>Describe on Train dataframe</a></li>
+                <li class={{ context["show_train"] }} ><a href={{ url_for('datawrangling.show_text', mkey='unna', mtype='train', returnpage='_featuree.html', action='show') }}>Unique & Nan on Test dataframe</a></li>
+
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('show_text', mkey='info', mtype='test', returnpage='_featuree.html') }}>Info on Test dataframe</a></li>
-                <li><a href={{ url_for('show_text', mkey='dtypes', mtype='test', returnpage='_featuree.html') }}>Dtypes on Test dataframe</a></li>
-                <li><a href={{ url_for('show_describe', mkey='describe', mtype='test', returnpage='_featuree.html') }}>Describe on Test dataframe</a></li>
+                <li class={{ context["show_test"] }}><a href={{ url_for('datawrangling.show_text', mkey='info', mtype='test', returnpage='_featuree.html', action='show') }}>Info on Test dataframe</a></li>
+                <li class={{ context["show_test"] }}><a href={{ url_for('datawrangling.show_text', mkey='dtypes', mtype='test', returnpage='_featuree.html', action='show') }}>Dtypes on Test dataframe</a></li>
+                <li class={{ context["show_test"] }}><a href={{ url_for('datawrangling.show_describe', mkey='describe', mtype='test', returnpage='_featuree.html') }}>Describe on Test dataframe</a></li>
+                <li class={{ context["show_test"] }} ><a href={{ url_for('datawrangling.show_text', mkey='unna', mtype='test', returnpage='_featuree.html', action='show') }}>Unique & Nan on Test dataframe</a></li>
+                
+                <li class={{ context["show_full"] }}  role="separator" class="divider"></li>
+                <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.show_text', mkey='info', mtype='full', returnpage='_datae.html', action='show') }}>Info on Full dataframe</a></li>
+                <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.show_text', mkey='dtypes', mtype='full', returnpage='_datae.html', action='show') }}>Dtypes on Full dataframe</a></li>
+                <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.show_describe', mkey='describe', mtype='full', returnpage='_dataw.html') }}>Describe on Full dataframe</a></li>
+                <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.show_text', mkey='unna', mtype='full', returnpage='_datae.html', action='show') }}>Unique & Nan on Full dataframe</a></li>
+
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('column_list', mtype='full', returnpage='_featuree.html') }}>Column List [FULL]</a></li>
-                <li><a href={{ url_for('column_list', mtype='train', returnpage='_featuree.html') }}>Column List [TRAIN]</a></li>
-                <li><a href={{ url_for('column_list', mtype='test', returnpage='_featuree.html') }}>Column List [TEST]</a></li>
+                <li><a href={{ url_for('datawrangling.column_list', mtype='full', returnpage='_featuree.html') }}>Column List [FULL]</a></li>
+                <li><a href={{ url_for('datawrangling.column_list', mtype='train', returnpage='_featuree.html') }}>Column List [TRAIN]</a></li>
+                <li><a href={{ url_for('datawrangling.column_list', mtype='test', returnpage='_featuree.html') }}>Column List [TEST]</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href={{ url_for('load_dictionaries', mtype='full', returnpage='_featuree.html') }}>Upload Dictionaries</a></li>
               </ul>
@@ -45,18 +55,18 @@
             <li class={{ context["fileoutput_head"] }}>
               <a href="#" class={{ context["fileoutput"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">File Output <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href={{ url_for('list_output', jolly='all', returnpage='_featuree.html') }}>All Files by Session</a></li>
-                <li><a href={{ url_for('list_output', jolly='general_config', returnpage='_featuree.html') }}>General Config by Session</a></li>
-                <li><a href={{ url_for('list_output', jolly='dict', returnpage='_featuree.html') }}>Dictionary Files by Session</a></li>
-                <li><a href={{ url_for('list_output', jolly='plot', returnpage='_featuree.html') }}>Plots by Session</a></li>
-                <li><a href={{ url_for('list_output', jolly='info', returnpage='_featuree.html') }}>Dataframe Info by Session</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='all', returnpage='_featuree.html') }}>All Files by Session</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='general_config', returnpage='_featuree.html') }}>General Config by Session</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='dict', returnpage='_featuree.html') }}>Dictionary Files by Session</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='plot', returnpage='_featuree.html') }}>Plots by Session</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='info', returnpage='_featuree.html') }}>Dataframe Info by Session</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('list_output', jolly='tbd', returnpage='_featuree.html') }}>TBD</a></li>
-                <li><a href={{ url_for('list_output', jolly='tbd', returnpage='_featuree.html') }}>TBD</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='tbd', returnpage='_featuree.html') }}>TBD</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='tbd', returnpage='_featuree.html') }}>TBD</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('list_output', jolly='tbd', returnpage='_featuree.html') }}>TBD</a></li>
-                <li><a href={{ url_for('list_output', jolly='tbd', returnpage='_featuree.html') }}>TBD</a></li>
-                <li><a href={{ url_for('list_output', jolly='tbd', returnpage='_featuree.html') }}>TBD</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='tbd', returnpage='_featuree.html') }}>TBD</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='tbd', returnpage='_featuree.html') }}>TBD</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='tbd', returnpage='_featuree.html') }}>TBD</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href="#">One more separated link</a></li>
               </ul>
