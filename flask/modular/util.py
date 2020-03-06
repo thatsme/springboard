@@ -43,11 +43,10 @@ class Util():
     @staticmethod
     def ResetDatapack():
         ## Reset previouse values
-            
         app.config["DATAPACK"]["test"] = ""
-        app.config["DATAPACK"]["train"] = "",
-        app.config["DATAPACK"]["full"] = "",
-        app.config["DATAPACK"]["test_loaded"] = False,
-        app.config["DATAPACK"]["train_loaded"] = False,
-        app.config["DATAPACK"]["full_loaded"] = False,
+        app.config["DATAPACK"]["train"] = ""
+        app.config["DATAPACK"]["full"] = ""
+        app.config["DATAPACK"]["test_loaded"] = False
+        app.config["DATAPACK"]["train_loaded"] = False
+        app.config["DATAPACK"]["full_loaded"] = False
         app.config["DATAPACK"]["column_list"] = []

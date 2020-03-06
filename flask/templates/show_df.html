@@ -1,0 +1,33 @@
+{% extends rr %}
+ 
+{% block container %}
+
+<table class="table table-dark>
+    <thead class="thead-dark">
+    <tr>
+        {% for col in column_names %}
+        <th id={{col}} scope="col" onclick="myFunction(this.id, '{{rr}}', '{{mtype}}' )">{{col}}</th>
+        {% endfor %}
+    </tr>
+    </thead>
+
+    {% for row in row_data %}
+    <tr>
+        {% for col, row_ in zip(column_names, row) %}
+        {% if col == link_column %}
+        <td>
+            <button type="submit" value={{ row_ }} name="person_id" form="patient_form" class="patient_button">
+                {{ row_ }}
+            </button>
+        </td>
+        {% else %}
+        <td>{{row_}}</td>
+        {% endif %}
+        {% endfor %}
+    </tr>
+    {% endfor %}
+    <tr>
+    <td colspan="10"><label id="show_unique"></label></td> 
+    </tr>
+</table>
+{% endblock %}

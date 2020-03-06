@@ -7,8 +7,7 @@
 
 import re 
 import os
-import io
-from pathlib import Path
+from io import StringIO
 from shutil import copyfile
 import logging
 import yaml
@@ -32,7 +31,6 @@ from modular.MlUtil import MlUtil
 from modular.transformers import (CategoriesExtractor, CountryTransformer, GoalAdjustor,
                           TimeTransformer)
 from modular.util import Util
-
 
 #mactive = []
 #v_config = "dropdown-menu"
@@ -74,12 +72,14 @@ from datawrangling import datawrangling
 from pipelines import pipelines
 from sessions import sessions
 from files import files
+from util import util
 
 ## BLUEPRINTS REGISTRATION
 app.register_blueprint(datawrangling)
 app.register_blueprint(pipelines)
 app.register_blueprint(sessions)
 app.register_blueprint(files)
+app.register_blueprint(util)
 
 #config = app.config["C"]
 #config.read('MlUtil.ini')
@@ -171,60 +171,6 @@ def load_dictionaries():
 
     
 
-@app.route('/generalconfig',methods = ['POST', 'GET'])
-def general_config():
-
-    if not app.config["MACTIVE"]:
-        logger.error("Error, u have at list generate and select an active session for setting General Configuration")
-        return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])       
-    else:
-        src = app.config["APP_FOLDER"]+"general_config.ini"
-        dst = app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_"+"general_config.ini"
-        section_grid = "GENERAL"
-        if(request.method == 'POST'):
-            ## Scrive le modifiche sul file di configurazione x sessione
-            result = request.form
-            logger.info(result.get('logname'))
-
-            for key, value in result.items():
-                app.config["C"].set(section_grid, key, value)
- 
-            try:
-                with open(dst, 'w') as configfile:
-                    app.config["C"].write(configfile)
-                    logger.info("writing config file done")
-
-                general = app.config["C"][section_grid]
-                
-                try:
-                    return render_template('general_config.html', data=general)
-                except Exception as e:
-                    return render_template('tb_implemented.html', version=app.config["DATAPACK"], error=e)
-
-
-            except:
-                logger.debug("Config File write exception", exc_info=True)
-                return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
-            
-        elif(request.method == 'GET'):
-            my_file = Path(dst)
-            if my_file.is_file():        
-                app.config["C"].read(dst)
-            else:
-                try:
-                    copyfile(src, dst)
-                    app.config["C"].read(dst)
-                except:
-                    logger.debug("Copy file error %s, %s", src, dst)
-
-            general = app.config["C"][section_grid]
-            try:
-                return render_template('general_config.html', data=general) 
-            except Exception as e:
-                return render_template('tb_implemented.html', version=app.config["DATAPACK"], error=e)
-        else:
-            logger.debug("Illegal Method")
-            return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
         
 @app.route('/loaddata',methods = ['POST'])
 def loaddata():
@@ -260,7 +206,7 @@ def loaddata():
                 df_test = app.config["M"].getTest()
 
                 ## Get info data on train and copy on session prefixed text file  
-                buffer = io.StringIO()
+                buffer = StringIO()
                 df_train.info(buf=buffer)
                 s = buffer.getvalue()
 
@@ -272,7 +218,7 @@ def loaddata():
                     return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
 
                 # Get info data on test and copy on session prefixed text file 
-                buffer = io.StringIO()
+                buffer = StringIO()
                 df_test.info(buf=buffer)
                 s = buffer.getvalue()
                 try:
@@ -283,7 +229,7 @@ def loaddata():
                     return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
 
                 # Get dtypes data on train and copy on session prefixed text file
-                buffer = io.StringIO()
+                buffer = StringIO()
                 df_train.dtypes.to_string(buf=buffer)
                 #logger.info(df_train.dtypes.to_dict())
                 #logger.info(df_train.dtypes.tolist())
@@ -296,7 +242,7 @@ def loaddata():
                     return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
 
                 # Get dtypes data on test and copy on session prefixed text file
-                buffer = io.StringIO()
+                buffer = StringIO()
                 df_test.dtypes.to_string(buf=buffer)
                 s = buffer.getvalue()
                 try:                
@@ -307,7 +253,7 @@ def loaddata():
                     return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
                 
                 # Get nunique and nan data on train and copy on session prefixed text file
-                buffer = io.StringIO()
+                buffer = StringIO()
                 na = df_train.isna().sum().to_frame(name='null')
                 un = df_train.nunique().to_frame(name='unique')
                 result = pd.concat([na, un], axis=1, sort=False)
@@ -322,7 +268,7 @@ def loaddata():
                     return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
 
                 # Get nunique and nan data on train and copy on session prefixed text file
-                buffer = io.StringIO()
+                buffer = StringIO()
                 na = df_test.isna().sum().to_frame(name='null')
                 un = df_test.nunique().to_frame(name='unique')
                 result = pd.concat([na, un], axis=1, sort=False)
@@ -355,7 +301,7 @@ def loaddata():
                 df = app.config["M"].getCombined()
                 
                 ## Get info data on full and copy on session prefixed text file  
-                buffer = io.StringIO()
+                buffer = StringIO()
                 df.info(buf=buffer)
                 s = buffer.getvalue()
                 try:
@@ -366,7 +312,7 @@ def loaddata():
                     return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
                     
                 # Get dtypes data on full and copy on session prefixed text file
-                buffer = io.StringIO()
+                buffer = StringIO()
                 df.dtypes.to_string(buf=buffer)
                 s = buffer.getvalue()
                 try:
@@ -378,7 +324,7 @@ def loaddata():
                 
                 
                 # Get nunique and nan data on train and copy on session prefixed text file
-                buffer = io.StringIO()
+                buffer = StringIO()
                 na = df.isna().sum().to_frame(name='null')
                 un = df.nunique().to_frame(name='unique')
                 result = pd.concat([na, un], axis=1, sort=False)

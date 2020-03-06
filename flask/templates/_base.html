@@ -35,7 +35,7 @@
                 <li role="separator" class="divider"></li>
                 <li><a href={{ url_for('sessions.session_reset', mkey='full') }}>Reset Session</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('general_config', mkey='full') }}>General Config</a></li>
+                <li><a href={{ url_for('util.general_config', mkey='full') }}>General Config</a></li>
               </ul>
             </li>
             <li class={{ context["loaddata_head"] }}>
@@ -48,14 +48,6 @@
                 <li><a href={{ url_for('split_data', mkey='full') }}>Split Full Data</a></li>
                 <li role="separator" class="divider"></li>                
                 <li><a href={{ url_for('dummy', mkey='test') }}>TBD</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('show_dataframe', mtype='train', where='head',num= 5) }}>Head Train Data</a></li>
-                <li><a href={{ url_for('show_dataframe', mtype='test', where='head',num= 5) }}>Head Test Data</a></li>
-                <li><a href={{ url_for('show_dataframe', mtype='full', where='head',num= 5) }}>Head Full Data</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('show_dataframe', mtype='train', where='tail',num= 5) }}>Tail Train Data</a></li>
-                <li><a href={{ url_for('show_dataframe', mtype='test', where='tail',num= 5) }}>Tail Test Data</a></li>
-                <li><a href={{ url_for('show_dataframe', mtype='full', where='tail',num= 5) }}>Tail Full Data</a></li>
                 <li role="separator" class="divider"></li>                
               </ul>
             </li>

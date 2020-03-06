@@ -25,7 +25,7 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
             <li class={{ context["dataexploration_head"] }}>
-              <a href="#" class={{ context["wataexploration"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Data Exploration <span class="caret"></span></a>
+              <a href="#" class={{ context["dataexploration"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Data Exploration <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li class={{ context["show_train"] }} ><a href={{ url_for('datawrangling.show_text', mkey='info', mtype='train', returnpage='_datae.html', action='show') }}>Info on Train dataframe</a></li>
                 <li class={{ context["show_train"] }} ><a href={{ url_for('datawrangling.show_text', mkey='dtypes', mtype='train', returnpage='_datae.html', action='show') }}>Dtypes on Train dataframe</a></li>
@@ -73,7 +73,7 @@
 
           <ul class="nav navbar-nav navbar-right">
             <li class="active"><a href="#">API ( External)<span class="sr-only">(current)</span></a></li>
-            <li><a href={{ url_for('show_log', mkey='show_log', returnpage='_datae.html') }}>Show Log</a></li>
+            <li><a href={{ url_for('files.show_log', mkey='show_log', returnpage='_datae.html') }}>Show Log</a></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Help <span class="caret"></span></a>
               <ul class="dropdown-menu">

@@ -41,6 +41,14 @@
                 <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.show_text', mkey='dtypes', mtype='full', returnpage='_dataw.html', action='show') }}>Dtypes on Full dataframe</a></li>
                 <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.show_describe', mkey='describe', mtype='full', returnpage='_dataw.html') }}>Describe on Full dataframe</a></li>
                 <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.show_text', mkey='unna', mtype='full', returnpage='_dataw.html', action='show') }}>Unique & Nan on Full dataframe</a></li>
+                <li class={{ context["show_full"] }} role="separator" class="divider"></li>
+                <li class={{ context["show_train"] }} ><a href={{ url_for('datawrangling.show_dataframe', mtype='train', where='head',num=10, returnpage='_dataw.html') }}>Head Train Data</a></li>
+                <li class={{ context["show_test"] }} ><a href={{ url_for('datawrangling.show_dataframe', mtype='test', where='head',num=10, returnpage='_dataw.html') }}>Head Test Data</a></li>
+                <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.show_dataframe', mtype='full', where='head',num=10, returnpage='_dataw.html') }}>Head Full Data</a></li>
+                <li class={{ context["show_train"] }} ><a href={{ url_for('datawrangling.show_dataframe', mtype='train', where='tail',num=10, returnpage='_dataw.html') }}>Tail Train Data</a></li>
+                <li class={{ context["show_test"] }} ><a href={{ url_for('datawrangling.show_dataframe', mtype='test', where='tail',num=10, returnpage='_dataw.html') }}>Tail Test Data</a></li>
+                <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.show_dataframe', mtype='full', where='tail',num=10, returnpage='_dataw.html') }}>Tail Full Data</a></li>
+
               </ul>
             </li>
             <li class={{ context["datawrangling_head"] }}>
@@ -86,7 +94,7 @@
 
           <ul class="nav navbar-nav navbar-right">
             <li class="active"><a href="#">API ( External)<span class="sr-only">(current)</span></a></li>
-            <li><a href={{ url_for('show_log', mkey='show_log', returnpage='_dataw.html') }}>Show Log</a></li>
+            <li><a href={{ url_for('files.show_log', mkey='show_log', returnpage='_dataw.html') }}>Show Log</a></li>
             <li class="dropdown">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Help <span class="caret"></span></a>
               <ul class="dropdown-menu">
@@ -108,5 +116,29 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script>
+    function myFunction(id, rr, mtype) {
+    //FIRST WE CAPTURE THE VALUE THAT THE USER INPUTS
+    // let userInput = {toSend: e.currentTarget.previousElementSibling.value}
+    var value = document.getElementById(id).textContent;  
+    var userInput = {column: value, rr: rr, mtype: mtype}
+    console.log(userInput)
+    //THEN WE SEND IT TO THE FLASK BACKEND USING AJAX (Fetch API)
+    fetch("/showclick", {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userInput)
+      }).then(function(response) {
+          response.json().then(function(json) {
+          // print that JSON
+          document.getElementById('show_unique').innerHTML = json.value;
+          console.log(json);
+      });
+  
+      })
+    }
+    </script>
   </body>
 </html>

@@ -20,8 +20,12 @@ def start_session():
     app.config["DATAPACK"]["train_loaded"] = False
     app.config["DATAPACK"]["test_loaded"] = False
     app.config["DATAPACK"]["full_loaded"] = False
+    app.config["DATAPACK"]["train"] = ""
+    app.config["DATAPACK"]["test"] = ""
+    app.config["DATAPACK"]["full"] = ""
     
     #return render_template('session_started.html', version=app.config["M"].__version__)
+    logger.info("=startsession=====================================================================================")
     logger.debug(app.config["DATAPACK"])
     
     try:
@@ -31,6 +35,8 @@ def start_session():
 
 @sessions.route('/sessionstatus')
 def session_status():
+    logger.info("=sessionstatus=====================================================================================")
+    logger.debug(app.config["DATAPACK"])
     
     try:
         return render_template('session_started.html', version=app.config["DATAPACK"])
@@ -58,7 +64,7 @@ def setsession():
                 temp = []
                 temp_active = []
                 temp_active = app.config["MACTIVE"]
-                temp = app.config["DATAPACK"]["activesession"]
+                temp = list(app.config["DATAPACK"]["activesession"])
                 temp.append(result.get('activesession'))
                 temp_active.append(result.get('activesession'))
                 app.config["DATAPACK"]["activesession"] = temp_active[-1]
@@ -76,7 +82,9 @@ def setsession():
         ## After a session is set .. enable the menus 
         app.config["CONTEXT"]["loaddata"] = "dropdown-toggle"
         app.config["CONTEXT"]["loaddata_head"] = "dropdown"
-            
+        
+        logger.info("=setsession=====================================================================================")
+        logger.debug(app.config["DATAPACK"])    
     else:
         logger.debug("Illegal Method")
         return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
