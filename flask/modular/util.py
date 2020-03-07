@@ -1,10 +1,27 @@
 from flask import current_app as app
 from shutil import copyfile
 from werkzeug.local import LocalProxy
+from io import StringIO
+from flask import render_template
+import pandas as pd 
 
 logger = LocalProxy(lambda: app.logger)
 
 class Util():
+    
+    @staticmethod
+    def getCheckFromForm(r, postfix):
+        col = []
+        act = []
+        filtered_dict = {k:v for (k,v) in r.items() if postfix in k}
+        logger.debug(filtered_dict)
+        for k,v in filtered_dict.items():
+            kk = k.split("_")
+            col.append(kk[0])
+            act.append(kk[1])
+        
+        return col, act
+    
     @staticmethod
     def CheckTypes(type):
         if(type in app.config["ENABLED_TYPES"]):
@@ -50,3 +67,57 @@ class Util():
         app.config["DATAPACK"]["train_loaded"] = False
         app.config["DATAPACK"]["full_loaded"] = False
         app.config["DATAPACK"]["column_list"] = []
+        
+        
+    @staticmethod
+    def writeInfo(df, mtype):
+        
+        ## Get info data on full and copy on session prefixed text file  
+        buffer = StringIO()
+        df.info(buf=buffer)
+        s = buffer.getvalue()
+        try:
+            with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_"+mtype+"info.txt", "w", encoding="utf-8") as f:  
+                f.write(s)
+        except IOError as e:
+            logger.debug("File write exception", exc_info=True)
+            return render_template('show_error.html', content=e)   
+        except :
+            logger.debug("File write exception", exc_info=True)
+            return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
+            
+    @staticmethod
+    def writeDtypes(df, mtype):
+        buffer = StringIO()
+        df.dtypes.to_string(buf=buffer)
+        #logger.info(df_train.dtypes.to_dict())
+        #logger.info(df_train.dtypes.tolist())
+        s = buffer.getvalue()
+        try:
+            with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_"+mtype+"dtypes.txt", "w", encoding="utf-8") as f:  
+                f.write(s)
+        except IOError as e:
+            logger.debug("File write exception", exc_info=True)
+            return render_template('show_error.html', content=e)  
+        except:
+            logger.debug("File write exception", exc_info=True)
+            return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
+
+    @staticmethod
+    def writeNunique(df, mtype):
+        buffer = StringIO()
+        na = df.isna().sum().to_frame(name='null')
+        un = df.nunique().to_frame(name='unique')
+        result = pd.concat([na, un], axis=1, sort=False)
+        result.to_string(buf=buffer)
+        
+        s = buffer.getvalue()
+        try:
+            with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_"+mtype+"unna.txt", "w", encoding="utf-8") as f:  
+                f.write(s)
+        except IOError as e:
+            logger.debug("File write exception", exc_info=True)
+            return render_template('show_error.html', content=e)  
+        except:
+            logger.debug("File write exception", exc_info=True)
+            return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   

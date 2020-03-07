@@ -8,6 +8,7 @@ from werkzeug.utils import secure_filename
 from io import StringIO
 from os import listdir
 from os.path import join as jj
+from modular.util import Util
 import pandas as pd
 import numpy as np
 pd.options.display.float_format = '{:.3f}'.format
@@ -72,16 +73,18 @@ def list_input():
 
 @files.route('/listoutput/<jolly>,<returnpage>')
 def list_output(jolly, returnpage):
+    
     list_of_files = []
     filtered_names = []
     filtere_by_session = []
+    
     for filename in listdir(app.config["OUTPUT_FOLDER"]):
         list_of_files.append(filename)
 
-    logger.debug(list_of_files)
-    logger.debug(app.config["DATAPACK"]["activesession"])
-    logger.debug(returnpage)
-    logger.debug(jolly)
+    #logger.debug(list_of_files)
+    #logger.debug(app.config["DATAPACK"]["activesession"])
+    #logger.debug(returnpage)
+    #logger.debug(jolly)
     
     
     if(len(list_of_files)==0):
@@ -155,83 +158,23 @@ def loaddata():
                 df_train = app.config["M"].getTrain()
                 df_test = app.config["M"].getTest()
 
-                ## Get info data on train and copy on session prefixed text file  
-                buffer = StringIO()
-                df_train.info(buf=buffer)
-                s = buffer.getvalue()
-
-                try:                
-                    with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_traininfo.txt", "w", encoding="utf-8") as f:  
-                        f.write(s)
-                except:
-                    logger.debug("File write exception", exc_info=True)
-                    return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
-
-                # Get info data on test and copy on session prefixed text file 
-                buffer = StringIO()
-                df_test.info(buf=buffer)
-                s = buffer.getvalue()
-                try:
-                    with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_testinfo.txt", "w", encoding="utf-8") as f:  
-                        f.write(s)
-                except:
-                    logger.debug("File write exception", exc_info=True)
-                    return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
+                ## Get info data on train and copy on session prefixed text file 
+                Util.writeInfo(df_train, "train")
+                 
+                # Get info data on test and copy on session prefixed text file                 
+                Util.writeInfo(df_test,"test")
 
                 # Get dtypes data on train and copy on session prefixed text file
-                buffer = StringIO()
-                df_train.dtypes.to_string(buf=buffer)
-                #logger.info(df_train.dtypes.to_dict())
-                #logger.info(df_train.dtypes.tolist())
-                s = buffer.getvalue()
-                try:
-                    with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_traindtypes.txt", "w", encoding="utf-8") as f:  
-                        f.write(s)
-                except:
-                    logger.debug("File write exception", exc_info=True)
-                    return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
+                Util.writeDtypes(df_train,"train")
 
                 # Get dtypes data on test and copy on session prefixed text file
-                buffer = StringIO()
-                df_test.dtypes.to_string(buf=buffer)
-                s = buffer.getvalue()
-                try:                
-                    with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_testdtypes.txt", "w", encoding="utf-8") as f:  
-                        f.write(s)
-                except:
-                    logger.debug("File write exception", exc_info=True)
-                    return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
+                Util.writeDtypes(df_test,"test")
                 
                 # Get nunique and nan data on train and copy on session prefixed text file
-                buffer = StringIO()
-                na = df_train.isna().sum().to_frame(name='null')
-                un = df_train.nunique().to_frame(name='unique')
-                result = pd.concat([na, un], axis=1, sort=False)
-                result.to_string(buf=buffer)
-                
-                s = buffer.getvalue()
-                try:
-                    with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_trainunna.txt", "w", encoding="utf-8") as f:  
-                        f.write(s)
-                except:
-                    logger.debug("File write exception", exc_info=True)
-                    return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
+                Util.writeNunique(df_train, "train")
 
-                # Get nunique and nan data on train and copy on session prefixed text file
-                buffer = StringIO()
-                na = df_test.isna().sum().to_frame(name='null')
-                un = df_test.nunique().to_frame(name='unique')
-                result = pd.concat([na, un], axis=1, sort=False)
-                result.to_string(buf=buffer)
-                
-                s = buffer.getvalue()
-                try:
-                    with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_testunna.txt", "w", encoding="utf-8") as f:  
-                        f.write(s)
-                except:
-                    logger.debug("File write exception", exc_info=True)
-                    return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
-                
+                # Get nunique and nan data on test and copy on session prefixed text file
+                Util.writeNunique(df_test, "test")                
                 
             else:
                 logger.debug("Error loading Dataframes on MUtil class", exc_info=True)
@@ -252,44 +195,15 @@ def loaddata():
                 # Copy back the dataframe and generate some statistics 
                 df = app.config["M"].getCombined()
                 
-                ## Get info data on full and copy on session prefixed text file  
-                buffer = StringIO()
-                df.info(buf=buffer)
-                s = buffer.getvalue()
-                try:
-                    with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_fullinfo.txt", "w", encoding="utf-8") as f:  
-                        f.write(s)
-                except:
-                    logger.debug("File write exception", exc_info=True)
-                    return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
-                    
-                # Get dtypes data on full and copy on session prefixed text file
-                buffer = StringIO()
-                df.dtypes.to_string(buf=buffer)
-                s = buffer.getvalue()
-                try:
-                    with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_fulldtypes.txt", "w", encoding="utf-8") as f:  
-                        f.write(s)
-                except:
-                    logger.debug("File write exception", exc_info=True)
-                    return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
+                ## Get info data on full dataset and copy on session prefixed text file  
+                Util.writeInfo(df, "full") 
+                                   
+                # Get dtypes data on full dataset and copy on session prefixed text file
+                Util.writeDtypes(df, "full")
                 
+                # Get nunique and nan data on full dataset and copy on session prefixed text file
+                Util.writeNunique(df, "full")
                 
-                # Get nunique and nan data on train and copy on session prefixed text file
-                buffer = StringIO()
-                na = df.isna().sum().to_frame(name='null')
-                un = df.nunique().to_frame(name='unique')
-                result = pd.concat([na, un], axis=1, sort=False)
-                result.to_string(buf=buffer)
-                
-                s = buffer.getvalue()
-                try:
-                    with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_fullunna.txt", "w", encoding="utf-8") as f:  
-                        f.write(s)
-                except:
-                    logger.debug("File write exception", exc_info=True)
-                    return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
-
             else:
                 logger.debug("Error loading Dataframes on MUtil class", exc_info=True)
                 return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   

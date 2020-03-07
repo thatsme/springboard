@@ -9,14 +9,14 @@
                 <th>Column Name</th>
                 <th>Action</th>
                 </tr>
+                <form action = "http://localhost:5000/runpipeline" method = "POST">
                 {% for pipeline_detail in pipelines %}
                     <tr>
-                    <td><input type="checkbox" name={{ pipeline_detail["colname"]}}_check ></td>
+                    <td><input type="checkbox" name={{ pipeline_detail["colname"]}}_{{ pipeline_detail["action"]}}_check ></td>
                     <td>{{ pipeline_detail["colname"]}}</td>
                     <td>{{ pipeline_detail["action"]}}</td>
                     </tr>
                 {% endfor %}
-                <form action = "http://localhost:5000/updatepipeline" method = "POST">
                 <tr><td colspan="3"><hr></tr>
                 <tr>
                 <td>###</td>

@@ -62,9 +62,11 @@
                 <li class={{ context["show_test"] }} ><a href={{ url_for('pipelines.create_pipeline', mtype='test', returnpage='_dataw.html') }}>Create/View DW Pipeline</a></li>
                 <li class={{ context["show_full"] }} ><a href={{ url_for('pipelines.create_pipeline', mtype='full', returnpage='_dataw.html') }}>Create/View DW Pipeline</a></li>
                 <li role="separator" class="divider"></li>
-                <li class={{ context["show_train"] }} ><a href={{ url_for('pipelines.prepare_pipeline', mtype='train', returnpage='_dataw.html') }}>Run DW Pipeline</a></li>
-                <li class={{ context["show_test"] }} ><a href={{ url_for('pipelines.prepare_pipeline', mtype='test', returnpage='_dataw.html') }}>Run DW Pipeline</a></li>
-                <li class={{ context["show_full"] }} ><a href={{ url_for('pipelines.prepare_pipeline', mtype='full', returnpage='_dataw.html') }}>Run DW Pipeline</a></li>
+                <li class={{ context["show_train"] }} ><a href={{ url_for('pipelines.prepare_pipeline', mtype='train', returnpage='_dataw.html') }}>Prepare/Run DW Pipeline</a></li>
+                <li class={{ context["show_test"] }} ><a href={{ url_for('pipelines.prepare_pipeline', mtype='test', returnpage='_dataw.html') }}>Prepare/Run DW Pipeline</a></li>
+                <li class={{ context["show_full"] }} ><a href={{ url_for('pipelines.prepare_pipeline', mtype='full', returnpage='_dataw.html') }}>Prepare/Run DW Pipeline</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href={{ url_for('pipelines.load_pipeline', mtype='train', returnpage='_dataw.html') }}>Load DW Pipeline</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href={{ url_for('load_dictionaries', mtype='full', returnpage='_dataw.html') }}>Upload Dictionaries</a></li>
                 <li role="separator" class="divider"></li>

@@ -8,15 +8,26 @@
                 <th>###</th>
                 <th>Column Name</th>
                 <th>Action</th>
+                <th>Param for Action</th>
                 </tr>
                 {% for pipeline_detail in pipelines %}
                     <tr>
                     <td><input type="checkbox" name={{ pipeline_detail["colname"]}}_check ></td>
                     <td>{{ pipeline_detail["colname"]}}</td>
                     <td>{{ pipeline_detail["action"]}}</td>
+                    {%if pipeline_detail["action"]=="dummies" %}
+                    <td> <input type="text" name="{{ pipeline_detail["colname"]}}_prefix" ></td>       
+                    {% endif %}
+                    {%if pipeline_detail["action"]=="map" %}
+                    <td> 
+                        <select name="dictionary" width="300px">   
+                        <option value="" SELECTED>Select dictionary</option>
+                        </select>                 
+                    </td>       
+                    {% endif %}
                     </tr>
                 {% endfor %}
-                <form action = "http://localhost:5000/runepipeline" method = "POST">
+                <form action = "http://localhost:5000/updatepipeline" method = "POST">
                 <tr><td colspan="3"><hr></tr>
                 <tr>
                 <td>###</td>

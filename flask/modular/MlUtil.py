@@ -482,10 +482,16 @@ class MlUtil():
     # Transform column in dummies        
     @check_name
     def transform_dummies(self, column, prefix, drop_first=False, axis=1):
-        for c, p in zip(column,prefix):
-            self.df_combined = pd.concat([self.df_combined, pd.get_dummies(self.df_combined[c], drop_first=drop_first, prefix=p)], axis=axis)
-        if(self.verbose>1):
-            print("Transformation done")
+        try:
+            for c, p in zip(column, prefix):
+                self.df_combined = pd.concat([self.df_combined, pd.get_dummies(self.df_combined[c], drop_first=drop_first, prefix=p)], axis=axis)
+            if(self.verbose>1):
+                print("Transformation done")
+            return self.df_combined.columns.values
+        except:
+            print("Error on dummies Transformation")
+            return False
+            
     
     @check_name
     def transform_drop(self, column, inplace=True):
