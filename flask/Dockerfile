@@ -1,5 +1,5 @@
 FROM ubuntu:latest
-MAINTAINER Alex "development@securtel.net"
+MAINTAINER Alex "alessio.battistutta@gmail.com"
 RUN apt-get update -y
 RUN apt-get install -y python3-pip python3-dev build-essential
 COPY requirements.txt /app/requirements.txt
