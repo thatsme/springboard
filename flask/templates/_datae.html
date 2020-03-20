@@ -25,7 +25,7 @@
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
           <ul class="nav navbar-nav">
             <li class={{ context["dataexploration_head"] }}>
-              <a href="#" class={{ context["dataexploration"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Data Exploration <span class="caret"></span></a>
+              <a href="#" class={{ context["dataexploration"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Stats Data (common) <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li class={{ context["show_train"] }} ><a href={{ url_for('datawrangling.show_text', mkey='info', mtype='train', returnpage='_datae.html', action='show') }}>Info on Train dataframe</a></li>
                 <li class={{ context["show_train"] }} ><a href={{ url_for('datawrangling.show_text', mkey='dtypes', mtype='train', returnpage='_datae.html', action='show') }}>Dtypes on Train dataframe</a></li>
@@ -42,9 +42,12 @@
                 <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.show_describe', mkey='describe', mtype='full', returnpage='_dataw.html') }}>Describe on Full dataframe</a></li>
                 <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.show_text', mkey='unna', mtype='full', returnpage='_datae.html', action='show') }}>Unique & Nan on Full dataframe</a></li>
                 <li role="separator" class="divider"></li>
-                <li class={{ context["show_full"] }}><a href={{ url_for('datawrangling.column_list', mtype='full', returnpage='_datae.html') }}>Column List [FULL]</a></li>
-                <li class={{ context["show_train"] }}><a href={{ url_for('datawrangling.column_list', mtype='train', returnpage='_datae.html') }}>Column List [TRAIN]</a></li>
-                <li class={{ context["show_test"] }}><a href={{ url_for('datawrangling.column_list', mtype='test', returnpage='_datae.html') }}>Column List [TEST]</a></li>
+                <li class={{ context["show_train"] }} ><a href={{ url_for('datawrangling.show_dataframe', mtype='train', where='head',num=10, returnpage='_dataw.html') }}>Head Train Data</a></li>
+                <li class={{ context["show_test"] }} ><a href={{ url_for('datawrangling.show_dataframe', mtype='test', where='head',num=10, returnpage='_dataw.html') }}>Head Test Data</a></li>
+                <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.show_dataframe', mtype='full', where='head',num=10, returnpage='_dataw.html') }}>Head Full Data</a></li>
+                <li class={{ context["show_train"] }} ><a href={{ url_for('datawrangling.show_dataframe', mtype='train', where='tail',num=10, returnpage='_dataw.html') }}>Tail Train Data</a></li>
+                <li class={{ context["show_test"] }} ><a href={{ url_for('datawrangling.show_dataframe', mtype='test', where='tail',num=10, returnpage='_dataw.html') }}>Tail Test Data</a></li>
+                <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.show_dataframe', mtype='full', where='tail',num=10, returnpage='_dataw.html') }}>Tail Full Data</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href={{ url_for('load_dictionaries', mtype='full', returnpage='_datae.html') }}>Upload Dictionaries</a></li>
               </ul>
