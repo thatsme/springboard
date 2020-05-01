@@ -7,7 +7,6 @@
 
 import re 
 import os
-from io import StringIO
 from shutil import copyfile
 import logging
 import yaml
@@ -22,10 +21,6 @@ from flask import redirect
 from flask import g
 from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField, PasswordField
 from werkzeug.utils import secure_filename
-import pandas as pd
-import numpy as np
-pd.options.display.float_format = '{:.3f}'.format
-np.set_printoptions(precision=3)
 from modular.SklearnHelper import SklearnHelper
 from modular.MlUtil import MlUtil 
 from modular.transformers import (CategoriesExtractor, CountryTransformer, GoalAdjustor,
@@ -128,15 +123,10 @@ def data_exploration():
 def dummy():
     return render_template('tb_implemented.html', version=app.config["DATAPACK"])
     
-
-            
-
 @app.route('/splitdata/<mkey>')
 def split_data(mkey):
     return render_template('tb_implemented.html')
     
- 
-
 
 @app.route('/loaddictionaries', methods=['GET', 'POST'])
 def load_dictionaries():
@@ -162,205 +152,6 @@ def load_dictionaries():
     elif(request.method == 'GET'):
         try:
             return render_template('load_dictionaries.html')
-        except Exception as e:
-            return render_template('tb_implemented.html', version=app.config["DATAPACK"], error=e)
-
-    else:
-        logger.debug("Illegal Method")
-        return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
-
-    
-
-        
-@app.route('/loaddata',methods = ['POST'])
-def loaddata():
-    if request.method == 'POST':
-        Util.ResetDatapack()
-        result = request.form
-        temp = []
-        for r in result.getlist('fileselect'):
-            temp.append(r)
-            #logger.info("fileselect -> *"+r+"*")
-
-        for key, value in result.items():
-            logger.info("--> key *"+key+"* --> value *"+value+"*")
-            #kkey = key.split("_")[0]
-            if key in temp:
-                app.config["DATAPACK"][value] = key
-                logger.info("datapack value -> *"+app.config["DATAPACK"][value]+"* datapack key -> *"+value+"*")
-
-
-        logger.info(app.config["DATAPACK"])
-        # If selection in datapack contain both train and test loaded files
-        # run the ML util and load files
-        if(("train" in app.config["DATAPACK"] and app.config["DATAPACK"]["train"] != "") and ("test" in app.config["DATAPACK"] and app.config["DATAPACK"]["test"] != "")):
-            Util.MoveUploadedFiles(app.config["DATAPACK"]["train"], app.config["OUTPUT_FOLDER"], app.config["DATAPACK"]["train"])
-            Util.MoveUploadedFiles(app.config["DATAPACK"]["test"], app.config["OUTPUT_FOLDER"], app.config["DATAPACK"]["test"])
-            
-            if(app.config["M"].loadSplittedData(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_"+app.config["DATAPACK"]["train"], app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_"+app.config["DATAPACK"]["test"])):
-                app.config["DATAPACK"]["train_loaded"] = True
-                app.config["DATAPACK"]["test_loaded"] = True
-
-                # Copy back the dataframe and generate some statistics 
-                df_train = app.config["M"].getTrain()
-                df_test = app.config["M"].getTest()
-
-                ## Get info data on train and copy on session prefixed text file  
-                buffer = StringIO()
-                df_train.info(buf=buffer)
-                s = buffer.getvalue()
-
-                try:                
-                    with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_traininfo.txt", "w", encoding="utf-8") as f:  
-                        f.write(s)
-                except:
-                    logger.debug("File write exception", exc_info=True)
-                    return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
-
-                # Get info data on test and copy on session prefixed text file 
-                buffer = StringIO()
-                df_test.info(buf=buffer)
-                s = buffer.getvalue()
-                try:
-                    with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_testinfo.txt", "w", encoding="utf-8") as f:  
-                        f.write(s)
-                except:
-                    logger.debug("File write exception", exc_info=True)
-                    return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
-
-                # Get dtypes data on train and copy on session prefixed text file
-                buffer = StringIO()
-                df_train.dtypes.to_string(buf=buffer)
-                #logger.info(df_train.dtypes.to_dict())
-                #logger.info(df_train.dtypes.tolist())
-                s = buffer.getvalue()
-                try:
-                    with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_traindtypes.txt", "w", encoding="utf-8") as f:  
-                        f.write(s)
-                except:
-                    logger.debug("File write exception", exc_info=True)
-                    return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
-
-                # Get dtypes data on test and copy on session prefixed text file
-                buffer = StringIO()
-                df_test.dtypes.to_string(buf=buffer)
-                s = buffer.getvalue()
-                try:                
-                    with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_testdtypes.txt", "w", encoding="utf-8") as f:  
-                        f.write(s)
-                except:
-                    logger.debug("File write exception", exc_info=True)
-                    return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
-                
-                # Get nunique and nan data on train and copy on session prefixed text file
-                buffer = StringIO()
-                na = df_train.isna().sum().to_frame(name='null')
-                un = df_train.nunique().to_frame(name='unique')
-                result = pd.concat([na, un], axis=1, sort=False)
-                result.to_string(buf=buffer)
-                
-                s = buffer.getvalue()
-                try:
-                    with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_trainunna.txt", "w", encoding="utf-8") as f:  
-                        f.write(s)
-                except:
-                    logger.debug("File write exception", exc_info=True)
-                    return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
-
-                # Get nunique and nan data on train and copy on session prefixed text file
-                buffer = StringIO()
-                na = df_test.isna().sum().to_frame(name='null')
-                un = df_test.nunique().to_frame(name='unique')
-                result = pd.concat([na, un], axis=1, sort=False)
-                result.to_string(buf=buffer)
-                
-                s = buffer.getvalue()
-                try:
-                    with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_testunna.txt", "w", encoding="utf-8") as f:  
-                        f.write(s)
-                except:
-                    logger.debug("File write exception", exc_info=True)
-                    return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
-                
-                
-            else:
-                logger.debug("Error loading Dataframes on MUtil class", exc_info=True)
-                return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
-                        
-        # If selection in datapack contain single full file ( pre splitting ) 
-        # run the ML util and load the file
-        elif(("full" in app.config["DATAPACK"] and app.config["DATAPACK"]["full"] != "")):        
-            Util.MoveUploadedFiles(app.config["DATAPACK"]["full"], app.config["OUTPUT_FOLDER"], app.config["DATAPACK"]["full"])
-
-            if(app.config["M"].loadSingleData(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_"+app.config["DATAPACK"]["full"])):
-
-                app.config["DATAPACK"]["full_loaded"] = True
-                app.config["CONTEXT"]["show_full"] = "show"
-                
-                # Copy back the dataframe and generate some statistics 
-                df = app.config["M"].getCombined()
-                
-                ## Get info data on full and copy on session prefixed text file  
-                buffer = StringIO()
-                df.info(buf=buffer)
-                s = buffer.getvalue()
-                try:
-                    with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_fullinfo.txt", "w", encoding="utf-8") as f:  
-                        f.write(s)
-                except:
-                    logger.debug("File write exception", exc_info=True)
-                    return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
-                    
-                # Get dtypes data on full and copy on session prefixed text file
-                buffer = StringIO()
-                df.dtypes.to_string(buf=buffer)
-                s = buffer.getvalue()
-                try:
-                    with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_fulldtypes.txt", "w", encoding="utf-8") as f:  
-                        f.write(s)
-                except:
-                    logger.debug("File write exception", exc_info=True)
-                    return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
-                
-                
-                # Get nunique and nan data on train and copy on session prefixed text file
-                buffer = StringIO()
-                na = df.isna().sum().to_frame(name='null')
-                un = df.nunique().to_frame(name='unique')
-                result = pd.concat([na, un], axis=1, sort=False)
-                result.to_string(buf=buffer)
-                
-                s = buffer.getvalue()
-                try:
-                    with open(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_fullunna.txt", "w", encoding="utf-8") as f:  
-                        f.write(s)
-                except:
-                    logger.debug("File write exception", exc_info=True)
-                    return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
-
-            else:
-                logger.debug("Error loading Dataframes on MUtil class", exc_info=True)
-                return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
-        else:
-            logger.error("Error, u have to select at list test/train csv or full single csv file")
-            return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])       
-
-        ## Enable the rest of menus after the data is loaded
-        app.config["CONTEXT"]["datawrangling"] = "dropdown-toggle"
-        app.config["CONTEXT"]["datawrangling_head"] = "dropdown"
-        app.config["CONTEXT"]["dataexploration"] = "dropdown-toggle"
-        app.config["CONTEXT"]["dataexploration_head"] = "dropdown"
-        app.config["CONTEXT"]["featureengineering"] = "dropdown-toggle"
-        app.config["CONTEXT"]["featureengineering_head"] = "dropdown"
-        app.config["CONTEXT"]["fileoutput"] = "dropdown-toggle"
-        app.config["CONTEXT"]["fileoutput_head"] = "dropdown"
-        app.config["CONTEXT"]["ensamble"] = "dropdown-toggle"
-        app.config["CONTEXT"]["ensamble_head"] = "dropdown"
-
-        try:
-            logger.debug(app.config["CONTEXT"])
-            logger.debug(app.config["DATAPACK"])
-            return redirect("/sessionstatus")
         except Exception as e:
             return render_template('tb_implemented.html', version=app.config["DATAPACK"], error=e)
 
@@ -395,36 +186,6 @@ def test_pandas(mkey):
     try:
         return render_template("test_pandas.html", column_names=df.columns.values, row_data=list(df.values.tolist()),
                             link_column="PassengerId", zip=zip)
-    except Exception as e:
-        return render_template('tb_implemented.html', version=app.config["DATAPACK"], error=e)
-
-@app.route('/showdataframe/<mtype>,<where>,<num>')
-def show_dataframe(mtype, where, num):
-    # Da rivedere completamente
-    if(mtype=="train"):
-        df = app.config["M"].getTrain()
-        cnames = df.columns.values
-        if(where=="head"):
-            rdata = list(df.head(int(num)).values.tolist())
-        else:
-            rdata = list(df.tail(int(num)).values.tolist())
-
-    elif(mtype=="test"):
-        df = app.config["M"].getTest()
-        cnames = df.columns.values
-        if(where=="head"):
-            rdata = list(df.head(int(num)).values.tolist())
-        else:
-            rdata = list(df.tail(int(num)).values.tolist())
-
-    else:
-        logger.debug("Wrong dataframe type %s", mtype)
-        return("")
-
-    # link_column is the column that I want to add a button to
-    try:
-        return render_template("test_pandas.html", column_names=cnames, row_data=rdata,
-                           link_column="PassengerId", zip=zip)
     except Exception as e:
         return render_template('tb_implemented.html', version=app.config["DATAPACK"], error=e)
 
