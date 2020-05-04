@@ -59,6 +59,8 @@ def plots():
         logger.info(result)
         plot_x = []
         plot_y = []
+        plot_size = []
+        plot_hover = []
         plot_to_hist_x = []
         plot_to_hist_y = []
         hist = False
@@ -100,12 +102,18 @@ def plots():
             elif(kkey[1]=="checky"):
                 if(value=="on"):
                     plot_y.append(kkey[0])
+            elif(kkey[1]=="checksize"):
+                if(value=="on"):
+                    plot_size.append(kkey[0])
+            elif(kkey[1]=="checkhover"):
+                if(value=="on"):
+                    plot_hover.append(kkey[0])
         if(typeofplot=="bar"):
-            test_plot.create_hist(df[plot_x+plot_y], plot_x, plot_y, groupby)
+            test_plot.create_hist(df, plot_x, plot_y, groupby)
         elif(typeofplot=="scatter"):
-            test_plot.create_scatter(df[plot_x+plot_y], plot_x, plot_y, groupby)
+            test_plot.create_scatter(df, plot_x, plot_y, plot_size, plot_hover, groupby)
         elif(typeofplot=="box"):
-            test_plot.create_box(df[plot_x+plot_y], plot_x, plot_y, groupby)
+            test_plot.create_box(df, plot_x, plot_y, groupby)
                         
     try:
         #p = test_plot.testplot()

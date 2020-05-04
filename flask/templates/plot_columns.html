@@ -30,6 +30,8 @@
           <th scope="col">Type</th>
           <th scope="col">X</th>
           <th scope="col">Y</th>
+          <th scope="col">Size</th>
+          <th scope="col">Hover</th>
       </tr>
       </thead>
         {% for column, type in columns %}
@@ -38,6 +40,8 @@
         <td>{{ type }}</td>
         <td><input type="checkbox" name="{{ column }}_checkx" width="50px"></td>
         <td><input type="checkbox" name="{{ column }}_checky" width="50px"></td>
+        <td><input type="checkbox" name="{{ column }}_checksize" width="50px"></td>
+        <td><input type="checkbox" name="{{ column }}_checkhover" width="50px"></td>
         </tr>
        {% endfor %}
        <input type="hidden" name="returnpage_layout" value={{ rr }}>
