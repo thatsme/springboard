@@ -1,38 +1,46 @@
 {% extends rr %}
  
 {% block container %}
+  <form action = "http://localhost:5000/plots" method = "POST">
+  <table class="table table-dark">
+    <tr>
+    <td colspan="1"><input type="submit" value="Show Plot"></td>
+    <td> Type plot 
+      <select name="type_plot" width="300px">
+      <option value="" SELECTED>Select plot</option>
+      <option value="bar">Bar Plot</option>
+      <option value="scatter">Scatter Plot</option>
+      <option value="box">Box Plot</option>
+      </select>
+    </td>
+
+    <td> Group by 
+      <select name="group_by" width="300px">
+      <option value="" SELECTED>Select group</option>
+      <option value="x">By X</option>
+      <option value="y">By Y</option>
+      </select>
+    </td>
+    </tr>
+  </table>
   <table class="table table-dark">
       <thead class="thead-dark">
       <tr>
           <th scope="col">Column</th>
           <th scope="col">Type</th>
-          <th scope="col">Prefix</th>
-          <th scope="col">New Name</th>
-          <th scope="col">Action</th>
+          <th scope="col">X</th>
+          <th scope="col">Y</th>
       </tr>
       </thead>
-      <form action = "http://localhost:5000/plots" method = "POST">
-        <tr>
-        <td colspan="3"><input type="submit" value="Show Plot"></td>
-        </tr>
         {% for column, type in columns %}
         <tr>
         <td><a href="{{ url_for('detailmethod', mkey=your_list_element) }}">{{ column }}</a></td>
         <td>{{ type }}</td>
-        <td>
-          <select name="{{ column }}_select" width="300px">
-          <option value="" SELECTED>Select action</option>
-          <option value="hist|x">Histogram [X]</option>
-          <option value="hist|y">Histogram [Y]</option>
-          <option value="scatter|x">Scatter [X]</option>
-          <option value="scatter|y">Scatter [Y]</option>
-          <option value="box|x">Box [X]</option>
-          <option value="box|y">Box [Y]</option>
-          </select>
-        </td>
+        <td><input type="checkbox" name="{{ column }}_checkx" width="50px"></td>
+        <td><input type="checkbox" name="{{ column }}_checky" width="50px"></td>
         </tr>
        {% endfor %}
        <input type="hidden" name="returnpage_layout" value={{ rr }}>
-      </form>
       </table>
+  </form>
 {% endblock %}

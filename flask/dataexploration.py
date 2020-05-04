@@ -54,12 +54,17 @@ def plots():
     if(request.method == 'POST'):
         df = app.config["M"].getCombined()
         result = request.form
+        groupby = result.get("group_by")
+        typeofplot = result.get("type_plot")
         logger.info(result)
+        plot_x = []
+        plot_y = []
         plot_to_hist_x = []
         plot_to_hist_y = []
         hist = False
         plot_to_scatter_x = []
         plot_to_scatter_y = []
+        plot_to_scatter_c = []
         scatter = False
         plot_to_box_x = []
         plot_to_box_y = []
@@ -70,33 +75,38 @@ def plots():
             if(kkey[1]=="select"):
                 mvalue = value.split("|")
                 if(mvalue[0]=="hist"):
-                    hist = True
+                    typeofplot = "bar"
                     if(mvalue[1]=="x"):
                         plot_to_hist_x.append(kkey[0])
-                    else:
+                    elif(mvalue[1]=="y"):
                         plot_to_hist_y.append(kkey[0])
                 elif(mvalue[0]=="scatter"):
-                    scatter = True
+                    typeofplot = "scatter"
                     if(mvalue[1]=="x"):
                         plot_to_scatter_x.append(kkey[0])           
-                    else:
+                    elif(mvalue[1]=="y"):
                         plot_to_scatter_y.append(kkey[0])                                            
+                    elif(mvalue[1]=="c"):
+                        plot_to_scatter_c.append(kkey[0])                                            
                 elif(mvalue[0]=="box"):
-                    box = True
+                    typeofplot = "box"
                     if(mvalue[1]=="x"):
                         plot_to_box_x.append(kkey[0])
                     else:
                         plot_to_box_y.append(kkey[0])
-        if(hist):
-            test_plot.create_hist(df[plot_to_hist_x+plot_to_hist_y], plot_to_hist_x, plot_to_hist_y)
-        elif(scatter):
-            test_plot.create_scatter(df[plot_to_scatter_x+plot_to_scatter_y], plot_to_scatter_x, plot_to_scatter_y)
-        elif(box):
-            test_plot.create_box(df[plot_to_box_x+plot_to_box_y], plot_to_box_x, plot_to_box_y)
-            
-        logger.info(list(df[plot_to_scatter_x].values.tolist()))
-        logger.info(list(df[plot_to_scatter_y].values.tolist()))
-            
+            elif(kkey[1]=="checkx"):
+                if(value=="on"):
+                    plot_x.append(kkey[0])
+            elif(kkey[1]=="checky"):
+                if(value=="on"):
+                    plot_y.append(kkey[0])
+        if(typeofplot=="bar"):
+            test_plot.create_hist(df[plot_x+plot_y], plot_x, plot_y, groupby)
+        elif(typeofplot=="scatter"):
+            test_plot.create_scatter(df[plot_x+plot_y], plot_x, plot_y, groupby)
+        elif(typeofplot=="box"):
+            test_plot.create_box(df[plot_x+plot_y], plot_x, plot_y, groupby)
+                        
     try:
         #p = test_plot.testplot()
         p = test_plot.get_plot()
