@@ -64,6 +64,7 @@ import configparser as cp
 
 ## BLUEPRINTS IMPORT
 from datawrangling import datawrangling
+from dataexploration import dataexploration
 from pipelines import pipelines
 from sessions import sessions
 from files import files
@@ -71,6 +72,7 @@ from util import util
 
 ## BLUEPRINTS REGISTRATION
 app.register_blueprint(datawrangling)
+app.register_blueprint(dataexploration)
 app.register_blueprint(pipelines)
 app.register_blueprint(sessions)
 app.register_blueprint(files)
@@ -115,9 +117,9 @@ def home():
 def feature_engineering():
     return render_template('feature_engineering.html')
 
-@app.route('/dataexploration')
-def data_exploration():
-    return render_template('data_exploration.html')
+#@app.route('/dataexploration')
+#def data_exploration():
+#    return render_template('data_exploration.html')
 
 @app.route('/dummy')
 def dummy():

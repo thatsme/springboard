@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bha ......</title>
+    <title>Data Exploration Section</title>
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/navbar.css')}}">
   </head>
@@ -52,6 +52,15 @@
                 <li><a href={{ url_for('load_dictionaries', mtype='full', returnpage='_datae.html') }}>Upload Dictionaries</a></li>
               </ul>
             </li>
+            <li class={{ context["dataexploration_head"] }}>
+              <a href="#" class={{ context["dataexploration"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Plots <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li class={{ context["show_full"] }} ><a href={{ url_for('dataexploration.plot_list', mtype='full', returnpage='_datae.html') }}>Column List [FULL]</a></li>
+                <li class={{ context["show_train"] }} ><a href={{ url_for('dataexploration.plot_list', mtype='train', returnpage='_datae.html') }}>Column List [TRAIN]</a></li>
+                <li class={{ context["show_test"] }} ><a href={{ url_for('dataexploration.plot_list', mtype='test', returnpage='_datae.html') }}>Column List [TEST]</a></li>
+              </ul>
+            </li>
+
             <li class={{ context["fileoutput_head"] }}>
               <a href="#" class={{ context["fileoutput"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">File Output <span class="caret"></span></a>
               <ul class="dropdown-menu">
