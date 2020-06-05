@@ -33,7 +33,7 @@ class MyPlot():
                 fig.add_trace(go.Bar(
                     x=df[''.join(xvalue)],
                     y=df[''.join(my_y_columns)],
-                    name="Trace "+''.join(yvalue),       # this sets its legend entry
+                    name="Trace "+''.join(xvalue),       # this sets its legend entry
                 ))
             
         fig.update_layout(
@@ -86,7 +86,7 @@ class MyPlot():
                         #fillcolor=df[''.join(my_c_columns)],
                         name="Trace "+''.join(xvalue),       # this sets its legend entry
                         mode = 'markers',
-                        marker_size = df[''.join(my_size_columns)]
+                        marker_size = mksize
                     ))
 
             fig.update_layout(
@@ -109,16 +109,24 @@ class MyPlot():
 
         fig = go.Figure()
 
-        for yvalue in my_y_columns:
-            fig.add_trace(go.Box(
-                x=df[''.join(my_x_columns)],
-                y=df[''.join(yvalue)],
-                name="Trace "+''.join(yvalue),       # this sets its legend entry
-            ))
-
+        if(groupby=="y"):
+            for yvalue in my_y_columns:
+                fig.add_trace(go.Box(
+                    x=df[''.join(my_x_columns)],
+                    y=df[''.join(yvalue)],
+                    name="Trace "+''.join(yvalue),       # this sets its legend entry
+                ))
+        else:
+            for xvalue in my_x_columns:
+                fig.add_trace(go.Box(
+                    x=df[''.join(xvalue)],
+                    y=df[''.join(my_y_columns)],
+                    name="Trace "+''.join(xvalue),       # this sets its legend entry
+                ))
+            
         fig.update_layout(
             title=mtitle,
-            xaxis_title=''.join(my_x_columns),
+            xaxis_title='/'.join(my_x_columns),
             yaxis_title='/'.join(my_y_columns),
             font=dict(
                 family="Courier New, monospace",

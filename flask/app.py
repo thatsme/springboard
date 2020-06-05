@@ -10,6 +10,7 @@ import os
 from shutil import copyfile
 import logging
 import yaml
+import pandas as pd
 
 #import magic
 #import urllib.request

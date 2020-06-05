@@ -17,7 +17,7 @@ test_plot = MyPlot()
 dataexploration = Blueprint('dataexploration', __name__)
 
 logger = LocalProxy(lambda: app.logger)
-
+SEPARATOR = "____"
 
 @dataexploration.route('/dataexploration')
 def data_exploration():
@@ -54,8 +54,8 @@ def plots():
     if(request.method == 'POST'):
         df = app.config["M"].getCombined()
         result = request.form
-        groupby = result.get("group_by")
-        typeofplot = result.get("type_plot")
+        groupby = result.get("group"+SEPARATOR+"by")
+        typeofplot = result.get("type"+SEPARATOR+"plot")
         logger.info(result)
         plot_x = []
         plot_y = []
@@ -72,8 +72,8 @@ def plots():
         plot_to_box_y = []
         box = False
         for key, value in result.items():
-            #logger.info(key+" .. "+ value)
-            kkey = key.split('_')
+            logger.info(key+" .. "+ value)
+            kkey = key.split(SEPARATOR)
             if(kkey[1]=="select"):
                 mvalue = value.split("|")
                 if(mvalue[0]=="hist"):
@@ -121,6 +121,6 @@ def plots():
         #p = create_plot("Scatter")
         logger.info(p)
         #return render_template("test_plot.html", columns=col, rr=returnpage)
-        return render_template("test_plot.html", rr=result.get("returnpage_layout"), plot = p)
+        return render_template("test_plot.html", rr=result.get("returnpage"+SEPARATOR+"layout"), plot = p)
     except Exception as e:
         return render_template('tb_implemented.html',  version=app.config["DATAPACK"], error=e)

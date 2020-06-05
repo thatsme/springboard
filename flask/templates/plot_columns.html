@@ -6,16 +6,17 @@
     <tr>
     <td colspan="1"><input type="submit" value="Show Plot"></td>
     <td> Type plot 
-      <select name="type_plot" width="300px">
+      <select name="type____plot" width="300px">
       <option value="" SELECTED>Select plot</option>
+      <option value="line">Line Plot</option>
       <option value="bar">Bar Plot</option>
       <option value="scatter">Scatter Plot</option>
       <option value="box">Box Plot</option>
       </select>
     </td>
 
-    <td> Group by 
-      <select name="group_by" width="300px">
+    <td> Stack by 
+      <select name="group____by" width="300px">
       <option value="" SELECTED>Select group</option>
       <option value="x">By X</option>
       <option value="y">By Y</option>
@@ -38,13 +39,13 @@
         <tr>
         <td><a href="{{ url_for('detailmethod', mkey=your_list_element) }}">{{ column }}</a></td>
         <td>{{ type }}</td>
-        <td><input type="checkbox" name="{{ column }}_checkx" width="50px"></td>
-        <td><input type="checkbox" name="{{ column }}_checky" width="50px"></td>
-        <td><input type="checkbox" name="{{ column }}_checksize" width="50px"></td>
-        <td><input type="checkbox" name="{{ column }}_checkhover" width="50px"></td>
+        <td><input type="checkbox" name="{{ column }}____checkx" width="50px"></td>
+        <td><input type="checkbox" name="{{ column }}____checky" width="50px"></td>
+        <td><input type="checkbox" name="{{ column }}____checksize" width="50px"></td>
+        <td><input type="checkbox" name="{{ column }}____checkhover" width="50px"></td>
         </tr>
        {% endfor %}
-       <input type="hidden" name="returnpage_layout" value={{ rr }}>
+       <input type="hidden" name="returnpage____layout" value={{ rr }}>
       </table>
   </form>
 {% endblock %}

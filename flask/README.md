@@ -6,3 +6,10 @@
 4) Dockerfile is still on development, can change in any moment due to whatever :)
 5) There are for sure files useless, not needed, so files i have to trash, not now .. later 
 6) Thanks for the patient
+
+Instructions
+- actually work with :
+    - docker desktop for windows version 2.3.0.3 ( 45519 ) 
+
+for build the container : build.cmd
+for run the container : run.com
