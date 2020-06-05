@@ -2,3 +2,5 @@
 flask/.vscode/settings.json
 .vscode/settings.json
 *.txt
+.vscode/last.sql
+geckodriver.log
