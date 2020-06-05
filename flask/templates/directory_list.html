@@ -1,0 +1,23 @@
+{% extends '_base.html' %}
+ 
+{% block container %}
+    <div class="top-pad">
+        <div class="well">
+          <table>
+            <tr>
+              <th>Directory List</th>
+            </tr>
+            <form action = "/createstructure" method = "POST">
+            {% for your_list_element in your_list %}
+              <tr>
+                <td><a href="{{ url_for('test_pandas', mkey=your_list_element) }}">{{ your_list_element }}</a></td>
+              </tr>
+            {% endfor %}
+            <tr><td><hr></td></tr>
+            <tr><td><input type="text" name="newdirectory" size="20"><input type="hidden" name="currentpath" value="{{ current_path }}"></input></td></tr>
+            <tr><td><input type="submit" value="Create new directory"></td></tr>
+            </form>
+            </table>
+          </div>
+    </div>
+{% endblock %}

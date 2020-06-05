@@ -15,7 +15,10 @@
 	{% endwith %}
 </p>
 <form method="post" action="/upload" enctype="multipart/form-data">
-    <dl>
+	{% for your_list_element in dir_list %}
+	<input type="checkbox" name="directoryselect" value={{ your_list_element }}>{{ your_list_element }}</input></br>
+    {% endfor %}
+	<dl>
 		<p>
 			<input type="file" name="file[]" multiple='' autocomplete="off" required>
 		</p>

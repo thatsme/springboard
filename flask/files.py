@@ -1,3 +1,8 @@
+from io import StringIO
+import os
+from pathlib import Path
+from os.path import join as jj
+
 from flask import Blueprint
 from flask import render_template
 from flask import request
@@ -5,12 +10,11 @@ from flask import redirect
 from flask import current_app as app
 from werkzeug.local import LocalProxy
 from werkzeug.utils import secure_filename
-from io import StringIO
-from os import listdir
-from os.path import join as jj
+
 from modular.util import Util
 import pandas as pd
 import numpy as np
+
 pd.options.display.float_format = '{:.3f}'.format
 np.set_printoptions(precision=3)
 
@@ -25,6 +29,14 @@ logger = LocalProxy(lambda: app.logger)
 def upload_file():
     if(request.method == 'POST'):
         # check if the post request has the file part
+        upload_path = ""
+        mpath = request.form.get('directoryselect')
+        logger.info(mpath)
+        if mpath != app.config['UPLOAD_FOLDER']:
+            upload_path = mpath+"/"
+        else:
+            upload_path = app.config['UPLOAD_FOLDER']
+        
         if 'file[]' not in request.files:
             logger.debug('No file part')
             return redirect(request.url)
@@ -39,7 +51,7 @@ def upload_file():
                 logger.info(uploaded_files)  
                 filename = secure_filename(ffile.filename)
                 #ffile.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                ffile.save(jj(app.config['UPLOAD_FOLDER'], filename))
+                ffile.save(jj(upload_path, filename))
                 logger.info('File successfully uploaded')
             return redirect('/upload')
         else:
@@ -48,28 +60,77 @@ def upload_file():
 
     elif(request.method == 'GET'):
         try:
-            return render_template('upload.html')
+            directory_list = []
+            for path, dirs, files in os.walk(app.config["INPUT_FOLDER"]):
+                directory_list.append(path)
+                
+            return render_template('upload.html', dir_list=directory_list)
         except Exception as e:
             return render_template('tb_implemented.html', version=app.config["DATAPACK"], error=e)
 
     else:
         logger.debug("Illegal Method")
         return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
-      
-@files.route('/listinput')
-def list_input():
-    list_of_files = []
-    for filename in listdir(app.config["INPUT_FOLDER"]):
-        list_of_files.append(filename)
 
-    if(len(list_of_files)==0):
-        logger.warn('No files in input')
-        return redirect('/')
-    else:   
-        try:   
-            return render_template('file_list.html', your_list=list_of_files)
-        except Exception as e:
-            return render_template('tb_implemented.html', version=app.config["DATAPACK"], error=e)
+@files.route('/listinput', methods=['GET'])
+def list_input():
+    if(request.method == 'GET'):
+        mpath = request.args.get('mpath')
+        if(mpath != "."):
+            start_path = mpath+'/'
+        else:
+            start_path = app.config["INPUT_FOLDER"]
+        
+        directory_list = []
+        for path, dirs, files in os.walk(app.config["INPUT_FOLDER"]):
+            directory_list.append(path)
+
+        list_of_files = []
+        for filename in os.listdir(start_path):
+            if os.path.isfile(start_path+filename):
+                list_of_files.append(filename)
+
+        if(len(list_of_files)==0):
+            logger.warn('No files in input')
+            return redirect('/')
+        else:   
+            try:   
+                return render_template('file_list.html', file_list=list_of_files, dir_list=directory_list)
+            except Exception as e:
+                return render_template('tb_implemented.html', version=app.config["DATAPACK"], error=e)
+      
+@files.route('/createstructure', methods=['GET', 'POST'])
+def create_structure():
+    if(request.method == 'GET'):
+        mpath = request.args.get('mpath')
+        if(mpath and mpath != "."):
+            start_path = mpath+'/'
+        else:
+            start_path = app.config["INPUT_FOLDER"]
+        
+        list_of_dir = []
+        for filename in os.listdir(start_path):
+            if os.path.isdir(start_path+filename):
+                list_of_dir.append(filename)
+
+        if(len(list_of_dir)==0):
+            logger.warn('No directories in input')
+            return redirect('/')
+        else:   
+            try:   
+                return render_template('directory_list.html', your_list=list_of_dir, current_path = start_path)
+            except Exception as e:
+                return render_template('tb_implemented.html', version=app.config["DATAPACK"], error=e)
+
+    else:
+        mpath = request.form.get('newdirectory')
+        current = request.form.get('currentpath')
+        newdir = current+mpath
+        logger.info(newdir)
+        if not os.path.exists(newdir):
+            os.makedirs(newdir)
+        return redirect('/createstructure')
+
 
 @files.route('/listoutput/<jolly>,<returnpage>')
 def list_output(jolly, returnpage):
@@ -78,7 +139,7 @@ def list_output(jolly, returnpage):
     filtered_names = []
     filtere_by_session = []
     
-    for filename in listdir(app.config["OUTPUT_FOLDER"]):
+    for filename in os.listdir(app.config["OUTPUT_FOLDER"]):
         list_of_files.append(filename)
 
     #logger.debug(list_of_files)

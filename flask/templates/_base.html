@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bha ......</title>
+    <title>Machine Learning Helper - Home</title>
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/navbar.css')}}">
   </head>
@@ -41,13 +41,13 @@
             <li class={{ context["loaddata_head"] }}>
               <a href="#" class={{ context["loaddata"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Load Data <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a href={{ url_for('files.upload_file', mkey='full') }}>Upload File</a></li>
+                <li><a href={{ url_for('files.upload_file', mkey='full', ciccio='sdsdfsdfsdf') }}>Upload File</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('files.list_input', mkey='test') }}>List uploaded</a></li>
+                <li><a href="{{ url_for('files.list_input',mkey='none',mpath='.') }}">List uploaded</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href={{ url_for('split_data', mkey='full') }}>Split Full Data</a></li>
                 <li role="separator" class="divider"></li>                
-                <li><a href={{ url_for('dummy', mkey='test') }}>TBD</a></li>
+                <li><a href={{ url_for('files.create_structure', mkey='none',mpath='.') }}>Create Directory Structure</a></li>
                 <li role="separator" class="divider"></li>                
               </ul>
             </li>

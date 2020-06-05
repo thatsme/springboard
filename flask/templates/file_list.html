@@ -11,7 +11,10 @@
               <th>Load Type</th>
             </tr>
             <form action = "http://localhost:5000/loaddata" method = "POST">
-            {% for your_list_element in your_list %}
+            {% for your_dir_element in dir_list %}
+              <li><a href="{{ url_for('files.list_input', mpath=your_dir_element) }}">{{ your_dir_element }}
+            {% endfor %}
+            {% for your_list_element in file_list %}
               <tr>
                 <td><input type="checkbox" name="fileselect" value={{ your_list_element }}></input><br></td>
                 <td><a href="{{ url_for('test_pandas', mkey=your_list_element) }}">{{ your_list_element }}</a></td>

@@ -13,7 +13,7 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SECRET_KEY = '7d441f27d441f27567d441f2b6176a'
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
-    ALLOWED_EXTENSIONS = set(['csv','txt','yaml'])
+    ALLOWED_EXTENSIONS = set(['csv','txt','yaml','png','jpg','jpeg','gif'])
     APP_FOLDER = '/app/'
     UPLOAD_FOLDER = '/app/static/input/'
     INPUT_FOLDER = '/app/static/input/'

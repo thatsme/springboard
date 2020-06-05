@@ -112,7 +112,8 @@ def home():
 
     mlist1 = Util.Filter(mylist,sublist, exclude)
     logger.info(app.config["M"])
-    return render_template('section_list.html', your_list=methodlist)
+    #return render_template('section_list.html', your_list=methodlist)
+    return render_template('home.html', your_list=methodlist)
 
 @app.route('/featureengineering')
 def feature_engineering():
