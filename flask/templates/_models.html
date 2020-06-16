@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <titleMachine Learning Helper - Feature Engineering Section</title>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/navbar.css')}}">
+  </head>
+  <body>
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href={{ url_for('home') }}>Back to Home</a>
+        </div>
+    
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav">
+            <li class={{ context["models_head"] }}>
+              <a href="#" class={{ context["models"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Models Train/Validate/Predict <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li class={{ context["show_train"] }}><a href={{ url_for('datawrangling.show_text', mkey='info', mtype='train', returnpage='_models.html', action='show') }}>Info on Train dataframe</a></li>
+                <li class={{ context["show_train"] }}><a href={{ url_for('datawrangling.show_text', mkey='dtypes', mtype='train', returnpage='_models.html', action='show') }}>Dtypes on Train dataframe</a></li>
+                <li class={{ context["show_train"] }}><a href={{ url_for('datawrangling.show_describe', mkey='describe', mtype='train', returnpage='_models.html') }}>Describe on Train dataframe</a></li>
+                <li class={{ context["show_train"] }} ><a href={{ url_for('datawrangling.show_text', mkey='unna', mtype='train', returnpage='_models.html', action='show') }}>Unique & Nan on Test dataframe</a></li>
+
+                <li role="separator" class="divider"></li>
+                <li class={{ context["show_test"] }}><a href={{ url_for('datawrangling.show_text', mkey='info', mtype='test', returnpage='_models.html', action='show') }}>Info on Test dataframe</a></li>
+                <li class={{ context["show_test"] }}><a href={{ url_for('datawrangling.show_text', mkey='dtypes', mtype='test', returnpage='_models.html', action='show') }}>Dtypes on Test dataframe</a></li>
+                <li class={{ context["show_test"] }}><a href={{ url_for('datawrangling.show_describe', mkey='describe', mtype='test', returnpage='_models.html') }}>Describe on Test dataframe</a></li>
+                <li class={{ context["show_test"] }} ><a href={{ url_for('datawrangling.show_text', mkey='unna', mtype='test', returnpage='_models.html', action='show') }}>Unique & Nan on Test dataframe</a></li>
+                
+                <li class={{ context["show_full"] }}  role="separator" class="divider"></li>
+                <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.show_text', mkey='info', mtype='full', returnpage='_models.html', action='show') }}>Info on Full dataframe</a></li>
+                <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.show_text', mkey='dtypes', mtype='full', returnpage='_models.html', action='show') }}>Dtypes on Full dataframe</a></li>
+                <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.show_describe', mkey='describe', mtype='full', returnpage='_models.html') }}>Describe on Full dataframe</a></li>
+                <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.show_text', mkey='unna', mtype='full', returnpage='_models.html', action='show') }}>Unique & Nan on Full dataframe</a></li>
+
+                <li role="separator" class="divider"></li>
+                <li><a href={{ url_for('datawrangling.column_list', mtype='full', returnpage='_models.html') }}>Column List [FULL]</a></li>
+                <li><a href={{ url_for('datawrangling.column_list', mtype='train', returnpage='_models.html') }}>Column List [TRAIN]</a></li>
+                <li><a href={{ url_for('datawrangling.column_list', mtype='test', returnpage='_models.html') }}>Column List [TEST]</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href={{ url_for('files.load_dictionaries', mtype='full', returnpage='_models.html') }}>Upload Dictionaries</a></li>
+              </ul>
+            </li>
+            <li class={{ context["fileoutput_head"] }}>
+              <a href="#" class={{ context["fileoutput"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">File Output <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href={{ url_for('files.list_output', jolly='all', returnpage='_models.html') }}>All Files by Session</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='general_config', returnpage='_models.html') }}>General Config by Session</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='dict', returnpage='_models.html') }}>Dictionary Files by Session</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='plot', returnpage='_models.html') }}>Plots by Session</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='info', returnpage='_models.html') }}>Dataframe Info by Session</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href={{ url_for('files.list_output', jolly='tbd', returnpage='_models.html') }}>TBD</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='tbd', returnpage='_models.html') }}>TBD</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href={{ url_for('files.list_output', jolly='tbd', returnpage='_models.html') }}>TBD</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='tbd', returnpage='_models.html') }}>TBD</a></li>
+                <li><a href={{ url_for('files.list_output', jolly='tbd', returnpage='_models.html') }}>TBD</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#">One more separated link</a></li>
+              </ul>
+            </li>
+
+          </ul>
+
+          <ul class="nav navbar-nav navbar-right">
+            <li class="active"><a href="#">API ( External)<span class="sr-only">(current)</span></a></li>
+            <li><a href={{ url_for('files.show_log', mkey='show_log', returnpage='_featuree.html') }}>Show Log</a></li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Help <span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li><a href="#">Loading Files</a></li>
+                <li><a href="#">Managing Sessions</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="#">Separated link</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
+    </nav>
+    <div class="container">
+      {% block container %}{% endblock %}
+    </div>
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+  </body>
+</html>

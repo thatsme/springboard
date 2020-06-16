@@ -22,6 +22,18 @@ class Util():
         
         return col, act
     
+    
+    @staticmethod
+    def fixPath(mpath):
+        if(mpath[-1] != '/'):
+            return mpath+'/'
+        else:
+            return mpath
+
+    @staticmethod
+    def extractCategoryFromPath(mpath):
+        return mpath.split('/')[-2]
+    
     @staticmethod
     def CheckTypes(type):
         if(type in app.config["ENABLED_TYPES"]):
@@ -63,12 +75,32 @@ class Util():
         app.config["DATAPACK"]["test"] = ""
         app.config["DATAPACK"]["train"] = ""
         app.config["DATAPACK"]["full"] = ""
+        app.config["DATAPACK"]["directory"] = ""
+        
         app.config["DATAPACK"]["test_loaded"] = False
         app.config["DATAPACK"]["train_loaded"] = False
         app.config["DATAPACK"]["full_loaded"] = False
+        app.config["DATAPACK"]["directory_loaded"] = False
         app.config["DATAPACK"]["column_list"] = []
         
         
+
+    @staticmethod
+    def exportDf(df, mtype):
+        try:
+            df.to_csv(app.config["OUTPUT_FOLDER"]+app.config["DATAPACK"]["activesession"]+"_df_"+mtype+"_head.txt", index=True, sep= ' ', mode='a')        
+        except IOError as e:
+            logger.debug("File write exception", exc_info=True)
+            return render_template('show_error.html', content=e)   
+        except :
+            logger.debug("File write exception", exc_info=True)
+            return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
+
+    @staticmethod
+    def writeDescribe(df, mtype):
+        data = df.describe()
+        Util.exportDf(data, mtype)
+
     @staticmethod
     def writeInfo(df, mtype):
         

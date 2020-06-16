@@ -42,8 +42,11 @@
               <a href="#" class={{ context["loaddata"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Load Data <span class="caret"></span></a>
               <ul class="dropdown-menu">
                 <li><a href={{ url_for('files.upload_file', mkey='full', ciccio='sdsdfsdfsdf') }}>Upload File</a></li>
+                <li><a href={{ url_for('files.load_dictionaries', mtype='full', returnpage='_dataw.html') }}>Upload Dictionaries</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href="{{ url_for('files.list_input',mkey='none',mpath='.') }}">List uploaded</a></li>
+                <li><a href="{{ url_for('files.list_files',mkey='none',mpath='.') }}">List uploaded Files</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="{{ url_for('files.list_directories',mkey='none',mpath='.') }}">List uploaded Directory</a></li>
                 <li role="separator" class="divider"></li>
                 <li><a href={{ url_for('split_data', mkey='full') }}>Split Full Data</a></li>
                 <li role="separator" class="divider"></li>                
@@ -56,7 +59,11 @@
 
             <li class={{ context["dataexploration_head"] }}><a href={{ url_for('dataexploration.data_exploration', mkey='show_menu') }}>Data Exploration</a></li>
 
-            <li class={{ context["featureengineering_head"] }}><a href={{ url_for('feature_engineering', mkey='show_menu') }}>Feature Engineering</a></li>
+            <li class={{ context["featureengineering_head"] }}><a href={{ url_for('featureengineering.feature_engineering', mkey='show_menu') }}>Feature Engineering</a></li>
+
+            <li class={{ context["trainmodel_head"] }}><a href={{ url_for('train.train_model', mkey='show_menu') }}>Train Model</a></li>
+
+            <li class={{ context["predictmodel_head"] }}><a href={{ url_for('predict.predict_model', mkey='show_menu') }}>Predict</a></li>
 
             <li class={{ context["fileoutput_head"] }}>
               <a href="#" class={{ context["fileoutput"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">File Output <span class="caret"></span></a>

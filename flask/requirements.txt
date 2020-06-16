@@ -9,7 +9,8 @@ pandas
 numpy
 matplotlib
 seaborn
-sklearn
+scikit-learn
 xgboost
 pyyaml
 plotly
+opencv-python

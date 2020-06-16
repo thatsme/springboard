@@ -1,0 +1,17 @@
+{% extends '_base.html' %}
+ 
+{% block container %}
+    <div class="top-pad">
+        <div class="well">
+          <table class="table table-condensed">
+            <tr>
+              <th>Image</th>
+              <th>Statistics</th>
+            </tr>
+            <tr>
+                <td colspan="2"><img src="{{current_path}}{{file_list}}"></td>
+            </tr>
+            </table>
+          </div>
+    </div>
+{% endblock %}

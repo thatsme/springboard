@@ -49,7 +49,7 @@
                 <li class={{ context["show_test"] }} ><a href={{ url_for('datawrangling.show_dataframe', mtype='test', where='tail',num=10, returnpage='_dataw.html') }}>Tail Test Data</a></li>
                 <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.show_dataframe', mtype='full', where='tail',num=10, returnpage='_dataw.html') }}>Tail Full Data</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('load_dictionaries', mtype='full', returnpage='_datae.html') }}>Upload Dictionaries</a></li>
+                <li><a href={{ url_for('files.load_dictionaries', mtype='full', returnpage='_datae.html') }}>Upload Dictionaries</a></li>
               </ul>
             </li>
             <li class={{ context["dataexploration_head"] }}>

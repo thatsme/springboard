@@ -21,7 +21,9 @@ SEPARATOR = "____"
 
 @dataexploration.route('/dataexploration')
 def data_exploration():
-    return render_template('data_exploration.html')
+    chapter1 = "Data exploration is an approach similar to initial data analysis, whereby a data analyst uses visual exploration to understand what is in a dataset and the characteristics of the data, rather than through traditional data management systems. These characteristics can include size or amount of data, completeness of the data, correctness of the data, possible relationships amongst data elements or files/tables in the data."
+    chapter2 = "Data exploration is typically conducted using a combination of automated and manual activities. Automated activities can include data profiling or data visualization or tabular reports to give the analyst an initial view into the data and an understanding of key characteristics."
+    return render_template('data_exploration.html', chapter1=chapter1, chapter2=chapter2)
 
 
 @dataexploration.route('/plotlist/<mtype>,<returnpage>')

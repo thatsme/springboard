@@ -12,8 +12,8 @@ class DevelopmentConfig(Config):
 
     DEBUG = True
     SECRET_KEY = '7d441f27d441f27567d441f2b6176a'
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024
-    ALLOWED_EXTENSIONS = set(['csv','txt','yaml','png','jpg','jpeg','gif'])
+    MAX_CONTENT_LENGTH = 512 * 1024 * 1024
+    ALLOWED_EXTENSIONS = set(['csv','txt','yaml','png','jpg','jpeg','gif','zip'])
     APP_FOLDER = '/app/'
     UPLOAD_FOLDER = '/app/static/input/'
     INPUT_FOLDER = '/app/static/input/'
@@ -34,6 +34,10 @@ class DevelopmentConfig(Config):
                "dataexploration_head" : "disabled",
                "featureengineering" : "disabled",
                "featureengineering_head" : "disabled", 
+               "trainmodel" : "disabled",
+               "trainmodel_head" : "disabled", 
+               "predictmodel" : "disabled",
+               "predictmodel_head" : "disabled", 
                "fileoutput" : "disabled", 
                "fileoutput_head" : "disabled",
                "ensamble" : "disabled", 

@@ -1,5 +1,18 @@
-{% extends '_datae.html' %}
- 
+{% extends '_datae.html' %} 
 {% block container %}
-<pre>{{ content }}</pre>
+<div class="top-pad">
+    <div class="well">
+    <table class="table table-dark">
+        <tr>
+        <td>{{chapter1}}</td>
+        </tr>
+        <tr>
+        <td>{{chapter2}}</td>
+        </tr>
+        <tr>
+        <td>{{chapter3}}</td>
+        </tr>
+    </table>
+    </div>
+</div>
 {% endblock %}

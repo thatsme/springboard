@@ -1,0 +1,24 @@
+{% extends '_base.html' %}
+ 
+{% block container %}
+    <div class="top-pad">
+        <div class="well">
+          <table>
+            <tr>
+              <th>Directory List</th>
+            </tr>
+            <form action = "/listdirectories" method = "POST">
+            {% for your_dir_element in your_list %}
+              <tr>
+                <td><input type="checkbox" name="directoryselect" value={{ your_dir_element }}></input><br></td>
+                <td><a href="{{ url_for('files.list_directories', mpath=your_dir_element, current=current_path) }}">{{ your_dir_element }}</a></td>
+              </tr>
+            {% endfor %}
+            <tr><td><hr></td></tr>
+            <tr><td><input type="hidden" name="currentpath" value="{{ current_path }}"></input></td></tr>
+            <tr><td><input type="submit" value="Select directory"></td></tr>
+            </form>
+            </table>
+          </div>
+    </div>
+{% endblock %}

@@ -3,30 +3,59 @@
 {% block container %}
     <div class="top-pad">
         <div class="well">
-          <table>
+          <table class="table table-condensed">
             <tr>
               <th>###</th>
-              <th>File Name</th>
-              <th>Columns</th>
               <th>Load Type</th>
+              <th>Directory</th>
             </tr>
             <form action = "http://localhost:5000/loaddata" method = "POST">
             {% for your_dir_element in dir_list %}
-              <li><a href="{{ url_for('files.list_input', mpath=your_dir_element) }}">{{ your_dir_element }}
+            <tr>
+            <td><input type="checkbox" name="dirselect" value={{ your_dir_element }}></input><br></td>
+            <td>
+              <select name="{{ your_dir_element }}" width="300px">
+                <option value="" SELECTED>Select type</option>
+                <option value="directory">Image Classification</option>
+              </select>
+              </td>
+              <td>
+              <a href="{{ url_for('files.list_files', mpath=your_dir_element) }}">{{ your_dir_element }}
+              </td>
+            </tr>
             {% endfor %}
-            {% for your_list_element in file_list %}
+          </table>
+          <table class="table table-condensed">
+          <tr><td colspan="4"><hr></tr>
+            <tr>
+              <th>###</th>
+              <th>Load Type</th>
+              <th>File Name</th>
+              <th>Action</th>
+            </tr>
+            {% for your_list_element, extension in file_list %}
               <tr>
                 <td><input type="checkbox" name="fileselect" value={{ your_list_element }}></input><br></td>
-                <td><a href="{{ url_for('test_pandas', mkey=your_list_element) }}">{{ your_list_element }}</a></td>
-                <td><a href="{{ url_for('list_columns', mkey=your_list_element) }}">Show</a></td>
                 <td>
                   <select name="{{ your_list_element }}" width="300px">
                     <option value="" SELECTED>Select type</option>
+                    {% if extension == 'tabular' %}
                     <option value="train">Train data</option>
                     <option value="test">Test data</option>
                     <option value="full">Full data</option>
+                    {% endif %}
                   </select>
                 </td>
+                <td><a href="{{ url_for('files.test_pandas', mkey=your_list_element, mpath=current_path) }}">{{ your_list_element }}</a></td>
+                {% if extension == 'tabular' %}
+                <td><a href="{{ url_for('files.list_columns', mkey=your_list_element, mpath=current_path) }}">Show Cols</a></td>
+                {% endif %}
+                {% if extension == 'compress' %}
+                <td><a href="{{ url_for('files.unzip_data', mkey=your_list_element, mpath=current_path) }}">Unzip File</a></td>
+                {% endif %}
+                {% if extension == 'image' %}
+                <td><a href="{{ url_for('files.show_image', mkey=your_list_element, mpath=current_path) }}">Show Image</a></td>
+                {% endif %}
               </tr>
             {% endfor %}
             <tr><td colspan="4"><input type="submit" value="Select File Data & Type"></td></tr>

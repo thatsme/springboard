@@ -3,6 +3,18 @@
 {% block container %}
 
 <h2>Select a file to upload</h2>
+<div class="top-pad">
+    <div class="well">
+    <table class="table table-dark">
+        <tr>
+        <td>{{chapter1}}</td>
+        </tr>
+        <tr>
+        <td>{{chapter2}}</td>
+        </tr>
+    </table>
+    </div>
+</div>
 <p>
 	{% with messages = get_flashed_messages() %}
 	  {% if messages %}
@@ -21,7 +33,7 @@
 		</p>
     </dl>
     <p>
-		<input type="submit" value="Submit">
+		<input type="submit" value="Upload dictionary file">
 	</p>
 </form>
 {% endblock %}

@@ -48,27 +48,28 @@
                 <li class={{ context["show_train"] }} ><a href={{ url_for('datawrangling.show_dataframe', mtype='train', where='tail',num=10, returnpage='_dataw.html') }}>Tail Train Data</a></li>
                 <li class={{ context["show_test"] }} ><a href={{ url_for('datawrangling.show_dataframe', mtype='test', where='tail',num=10, returnpage='_dataw.html') }}>Tail Test Data</a></li>
                 <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.show_dataframe', mtype='full', where='tail',num=10, returnpage='_dataw.html') }}>Tail Full Data</a></li>
+                <li class={{ context["show_full"] }} role="separator" class="divider"></li>
+                <li class={{ context["show_directory"] }} ><a href={{ url_for('datawrangling.show_images', mkey='info', mtype='directory', returnpage='_dataw.html', action='show' ) }}>Show Image Set</a></li>
+                <li class={{ context["show_directory"] }} ><a href={{ url_for('datawrangling.create_mask', mkey='info', mtype='directory', returnpage='_dataw.html', action='mask' ) }}>Create Mask</a></li>
 
               </ul>
             </li>
             <li class={{ context["datawrangling_head"] }}>
               <a href="#" class={{ context["datawrangling"] }} data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Columns <span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.column_list', mtype='full', returnpage='_dataw.html') }}>Column List [FULL]</a></li>
                 <li class={{ context["show_train"] }} ><a href={{ url_for('datawrangling.column_list', mtype='train', returnpage='_dataw.html') }}>Column List [TRAIN]</a></li>
-                <li class={{ context["show_test"] }} ><a href={{ url_for('datawrangling.column_list', mtype='test', returnpage='_dataw.html') }}>Column List [TEST]</a></li>
-                <li role="separator" class="divider"></li>
                 <li class={{ context["show_train"] }} ><a href={{ url_for('pipelines.create_pipeline', mtype='train', returnpage='_dataw.html') }}>Create/View DW Pipeline</a></li>
-                <li class={{ context["show_test"] }} ><a href={{ url_for('pipelines.create_pipeline', mtype='test', returnpage='_dataw.html') }}>Create/View DW Pipeline</a></li>
-                <li class={{ context["show_full"] }} ><a href={{ url_for('pipelines.create_pipeline', mtype='full', returnpage='_dataw.html') }}>Create/View DW Pipeline</a></li>
-                <li role="separator" class="divider"></li>
                 <li class={{ context["show_train"] }} ><a href={{ url_for('pipelines.prepare_pipeline', mtype='train', returnpage='_dataw.html') }}>Prepare/Run DW Pipeline</a></li>
+                <li role="separator"  class={{ context["show_train"] }} ></li>
+                <li class={{ context["show_test"] }} ><a href={{ url_for('datawrangling.column_list', mtype='test', returnpage='_dataw.html') }}>Column List [TEST]</a></li>
+                <li class={{ context["show_test"] }} ><a href={{ url_for('pipelines.create_pipeline', mtype='test', returnpage='_dataw.html') }}>Create/View DW Pipeline</a></li>
                 <li class={{ context["show_test"] }} ><a href={{ url_for('pipelines.prepare_pipeline', mtype='test', returnpage='_dataw.html') }}>Prepare/Run DW Pipeline</a></li>
+                <li role="separator" class="divider"></li>
+                <li class={{ context["show_full"] }} ><a href={{ url_for('datawrangling.column_list', mtype='full', returnpage='_dataw.html') }}>Column List [FULL]</a></li>
+                <li class={{ context["show_full"] }} ><a href={{ url_for('pipelines.create_pipeline', mtype='full', returnpage='_dataw.html') }}>Create/View DW Pipeline</a></li>
                 <li class={{ context["show_full"] }} ><a href={{ url_for('pipelines.prepare_pipeline', mtype='full', returnpage='_dataw.html') }}>Prepare/Run DW Pipeline</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('pipelines.load_pipeline', mtype='train', returnpage='_dataw.html') }}>Load DW Pipeline</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('load_dictionaries', mtype='full', returnpage='_dataw.html') }}>Upload Dictionaries</a></li>
+                <li class={{ context["show_train"] }} ><a href={{ url_for('pipelines.load_pipeline', mtype='train', returnpage='_dataw.html') }}>Load DW Pipeline</a></li>
                 <li role="separator" class="divider"></li>
               </ul>
             </li>
@@ -112,7 +113,9 @@
       </div><!-- /.container-fluid -->
     </nav>
     <div class="container">
-      {% block container %}{% endblock %}
+      {% block container %}
+      
+      {% endblock %}
     </div>
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>

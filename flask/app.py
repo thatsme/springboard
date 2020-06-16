@@ -66,6 +66,9 @@ import configparser as cp
 ## BLUEPRINTS IMPORT
 from datawrangling import datawrangling
 from dataexploration import dataexploration
+from featureengineering import featureengineering
+from train import train
+from predict import predict
 from pipelines import pipelines
 from sessions import sessions
 from files import files
@@ -74,6 +77,9 @@ from util import util
 ## BLUEPRINTS REGISTRATION
 app.register_blueprint(datawrangling)
 app.register_blueprint(dataexploration)
+app.register_blueprint(featureengineering)
+app.register_blueprint(train)
+app.register_blueprint(predict)
 app.register_blueprint(pipelines)
 app.register_blueprint(sessions)
 app.register_blueprint(files)
@@ -115,14 +121,6 @@ def home():
     #return render_template('section_list.html', your_list=methodlist)
     return render_template('home.html', your_list=methodlist)
 
-@app.route('/featureengineering')
-def feature_engineering():
-    return render_template('feature_engineering.html')
-
-#@app.route('/dataexploration')
-#def data_exploration():
-#    return render_template('data_exploration.html')
-
 @app.route('/dummy')
 def dummy():
     return render_template('tb_implemented.html', version=app.config["DATAPACK"])
@@ -131,38 +129,6 @@ def dummy():
 def split_data(mkey):
     return render_template('tb_implemented.html')
     
-
-@app.route('/loaddictionaries', methods=['GET', 'POST'])
-def load_dictionaries():
-    if(request.method == 'POST'):
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
-        file = request.files['file']
-        if file.filename == '':
-            flash('No file selected for uploading')
-            return redirect(request.url)
-        if file and Util.allowed_file(file.filename):
-            #filename = secure_filename(file.filename)
-            filename = app.config["DATAPACK"]["activesession"]+"_dict_"+secure_filename(file.filename)
-            file.save(os.path.join(app.config['OUTPUT_FOLDER'], filename))
-            flash('File successfully uploaded')
-            return redirect('/loaddictionaries')
-        else:
-            flash('Allowed file types are csv and txt')
-            return redirect(request.url)
-
-    elif(request.method == 'GET'):
-        try:
-            return render_template('load_dictionaries.html')
-        except Exception as e:
-            return render_template('tb_implemented.html', version=app.config["DATAPACK"], error=e)
-
-    else:
-        logger.debug("Illegal Method")
-        return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
-
 @app.route('/detail/<mkey>')
 def detailmethod(mkey):
     mkeys = []
@@ -177,23 +143,6 @@ def detailmethod(mkey):
         return render_template('section_detail.html', your_list=zipped)
     except Exception as e:
         return render_template('tb_implemented.html', version=app.config["DATAPACK"], error=e)
-
-@app.route('/testpandas/<mkey>')
-def test_pandas(mkey):
-
-    try:
-        df = pd.read_csv(INPUT_FOLDER+mkey)
-    except:
-        logger.debug("File read exception", exc_info=True)
-
-    # link_column is the column that I want to add a button to
-    try:
-        return render_template("test_pandas.html", column_names=df.columns.values, row_data=list(df.values.tolist()),
-                            link_column="PassengerId", zip=zip)
-    except Exception as e:
-        return render_template('tb_implemented.html', version=app.config["DATAPACK"], error=e)
-
-
 
 @app.route('/featureseng', methods=['POST'])
 def features_eng():
@@ -236,23 +185,6 @@ def features_eng():
         logger.debug("Illegal Method")
         return render_template('show_error.html', content=app.config["DEFAULT_ERRORMESSAGE"])   
     
-@app.route('/listcolumns/<mkey>')
-def list_columns(mkey):
-
-    try:
-        df = pd.read_csv(app.config["INPUT_FOLDER"]+key)
-    except:
-        logger.debug("File read exception", exc_info=True)
-
-    mlist = list(df.columns.values)
-    df1 = pd.DataFrame({'Colums':mlist})
-    # link_column is the column that I want to add a button to
-
-    try:
-        return render_template("test_pandas.html", column_names=df1.columns.values, row_data=list(df1.values.tolist()),
-                           link_column="Columns", zip=zip)
-    except Exception as e:
-        return render_template('tb_implemented.html', version=app.config["DATAPACK"], error=e)
 
 @app.route('/formdebugger', methods=['POST'])
 def form_debugger():

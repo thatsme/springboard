@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import re
+import os
 
 from sklearn.model_selection import cross_val_score, KFold, StratifiedKFold, train_test_split, GridSearchCV, RandomizedSearchCV
 from sklearn.feature_selection import SelectKBest, f_classif, RFE
@@ -11,6 +12,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.ensemble import RandomForestClassifier, ExtraTreesRegressor, ExtraTreesClassifier, AdaBoostClassifier, GradientBoostingClassifier
 from sklearn.svm import SVC
 import xgboost as xgb
+import cv2
+
 import uuid
 from flask import Blueprint
 
@@ -18,6 +21,8 @@ from flask import Blueprint
 #import SklearnHelper
 import configparser
 from distutils.util import strtobool
+
+from modular.util import Util
 
 #from transformers import (CategoriesExtractor, CountryTransformer, GoalAdjustor,
 #                          TimeTransformer)
@@ -50,6 +55,10 @@ class MlUtil():
         self.NFOLDS = 5                         # set folds for out-of-fold prediction
         self.plot_to_image = False
         self.OUTPUT_FOLDER = ""
+        self.masterDirectory = ""
+        self.imagesStats = None
+        self.lastException = None
+        
         #self.kf = KFold(self.ntrain, n_folds= self.NFOLDS, random_state=self.SEED)
         # sklearn >= 0.20
         self.kf = KFold(n_splits=self.NFOLDS, random_state=self.SEED)
@@ -87,6 +96,9 @@ class MlUtil():
             "Lady" : "Royalty"
         }
 
+    def getLastException(self):
+        return self.lastException
+    
     def setPlotToImage(self, val):
         self.plot_to_image = val
         
@@ -118,7 +130,8 @@ class MlUtil():
             self.ntest = self.test_data.shape[0]
             self.ncombined = self.df_combined.shape[0]
             return True
-        except:
+        except Exception as e:
+            self.lastException = e
             return False
 
     def loadSingleData(self, df=None):
@@ -127,9 +140,66 @@ class MlUtil():
             self.combined_describe = self.df_combined.describe(include="all")
             self.combined_describe = self.combined_describe.round(3)
             return True
-        except:
+        except Exception as e:
+            self.lastException = e
             return False
 
+    def loadDirectoryData(self, dr=None):
+        
+        try:
+            self.masterDirectory = dr
+            column_list = ["Category", "Width", "Height", "Channel", "Filename", "Extension"]
+            list_of_dir = []
+            for filename in os.listdir(self.masterDirectory):
+                if os.path.isdir(self.masterDirectory+filename):
+                    list_of_dir.append(self.masterDirectory+filename+'/')
+                    
+            if(len(list_of_dir)==0):
+                self.lastException = "No subdirectories"
+                return False
+            
+            list_of_files = []
+            list_of_categories = []
+            list_of_extensions = []
+            list_of_image_h = []
+            list_of_image_w = []
+            list_of_image_c = []
+            
+            for directory in list_of_dir:
+                for filename in os.listdir(directory):
+                    if os.path.isfile(directory+filename):
+                        ff, file_extension = os.path.splitext(directory+filename)
+                        list_of_files.append(filename)
+                        #list_of_categories.append(directory)
+                        list_of_categories.append(Util.extractCategoryFromPath(directory))
+                        list_of_extensions.append(file_extension)
+                        try:
+                            im = cv2.imread(directory+filename)
+                            h, w, c = im.shape
+                        except Exception as e:
+                            self.lastException = e
+                            return False
+                            
+                        list_of_image_h.append(h)
+                        list_of_image_w.append(w)
+                        list_of_image_c.append(c)
+
+
+            if(len(list_of_files)==0):
+                self.lastException = "No files"
+                return False
+            
+            temp = pd.DataFrame(list(zip(list_of_categories, list_of_image_h, list_of_image_w, list_of_image_c, list_of_files, list_of_extensions)), columns=column_list)
+   
+            self.imagesCategories = temp['Category'].value_counts().to_frame()
+            
+            self.imagesStats = pd.get_dummies(temp, prefix='Cat', columns=['Category'])
+            
+            return True
+        except Exception as e:
+            self.lastException = e
+            return False
+        
     def getVar(self, v, typevar):
         if 'None' in v: 
             return None
@@ -227,9 +297,14 @@ class MlUtil():
             self.config.write(configfile)
 
     def display_all(self, df):
-        with pd.option_context("display.max_rows", 1000, "display.max_columns", 1000): 
-            display(df)
+        try:
+            with pd.option_context("display.max_rows", 1000, "display.max_columns", 1000): 
+                display(df)
             
+        except Exception as e:
+            self.lastException = e
+            return False
+        
     def RFE(self, train, num_feat):
         #y = train["Survived"]
         #X = train.drop("Survived",1)  
@@ -323,6 +398,15 @@ class MlUtil():
         else:
             return self.train_data
 
+    def getImagesStats(self):
+        if(self.features):
+            return self.imagesStats[self.features]
+        else:
+            return self.imagesStats
+
+    def getImagesCategories(self):
+        return self.imagesCategories
+        
     def getColumns(self, key):
         if(key=="train"):
             return self.train_data.columns.values.tolist()        

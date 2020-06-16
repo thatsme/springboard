@@ -3,7 +3,7 @@
 {% block container %}
 
     <p>Session Status values :         
-    <table>
+    <table class="table table-dark">
         <tr color="grey">
             <th>Key</th>
             <th>Value</th>
@@ -17,7 +17,7 @@
         </tr>
         <tr>
             <td>Active session</td>
-            <td>{{ version["activesession"] }}</td>
+            <td><b>{{ version["activesession"] }}</b></td>
         </tr>
         <tr>
             <td colspan="2"><hr style="height:6px;background-color:black;border:none;"></td>
@@ -28,7 +28,7 @@
         </tr>
         <tr>
             <td>Test data file loaded in session</td>
-            <td>{{ version["test_loaded"] }}</td>
+            <td><b>{{ version["test_loaded"] }}</b></td>
         </tr>
         <tr>
             <td colspan="2"><hr style="height:6px;background-color:black;border:none;"></td>
@@ -39,7 +39,7 @@
         </tr>
         <tr>
             <td>Train data file loaded in session</td>
-            <td>{{ version["train_loaded"] }}</td>
+            <td><b>{{ version["train_loaded"] }}</b></td>
         </tr>
         <tr>
             <td colspan="2"><hr style="height:6px;background-color:black;border:none;"></td>
@@ -50,7 +50,18 @@
         </tr>
         <tr>
             <td>Full data file loaded in session</td>
-            <td>{{ version["full_loaded"] }}</td>
+            <td><b>{{ version["full_loaded"] }}</b></td>
+        </tr>
+        <tr>
+            <td colspan="2"><hr style="height:6px;background-color:black;border:none;"></td>
+        </tr>
+        <tr>
+            <td>Directory selection</td>
+            <td>{{ version["directory"] }}</td>
+        </tr>
+        <tr>
+            <td>Directory data file loaded in session</td>
+            <td><b>{{ version["directory_loaded"] }}</b></td>
         </tr>
 
     </table>

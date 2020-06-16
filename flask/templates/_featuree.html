@@ -49,7 +49,7 @@
                 <li><a href={{ url_for('datawrangling.column_list', mtype='train', returnpage='_featuree.html') }}>Column List [TRAIN]</a></li>
                 <li><a href={{ url_for('datawrangling.column_list', mtype='test', returnpage='_featuree.html') }}>Column List [TEST]</a></li>
                 <li role="separator" class="divider"></li>
-                <li><a href={{ url_for('load_dictionaries', mtype='full', returnpage='_featuree.html') }}>Upload Dictionaries</a></li>
+                <li><a href={{ url_for('files.load_dictionaries', mtype='full', returnpage='_featuree.html') }}>Upload Dictionaries</a></li>
               </ul>
             </li>
             <li class={{ context["fileoutput_head"] }}>

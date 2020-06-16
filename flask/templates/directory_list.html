@@ -8,9 +8,9 @@
               <th>Directory List</th>
             </tr>
             <form action = "/createstructure" method = "POST">
-            {% for your_list_element in your_list %}
+            {% for your_dir_element in your_list %}
               <tr>
-                <td><a href="{{ url_for('test_pandas', mkey=your_list_element) }}">{{ your_list_element }}</a></td>
+                <td><a href="{{ url_for('files.create_structure', mkey=none, mpath=your_dir_element, current=current_path) }}">{{ your_dir_element }}</a></td>
               </tr>
             {% endfor %}
             <tr><td><hr></td></tr>
